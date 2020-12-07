@@ -1,0 +1,8 @@
+body {
+  background: rgb(204, 204, 204);
+  font-family: monospace;
+}
+
+.small {
+  font-size: 0.5rem;
+}
