@@ -1,8 +1,12 @@
 body {
-  background: rgb(204, 204, 204);
+  background: rgb(224, 224, 224);
   font-family: monospace;
 }
 
 .small {
   font-size: 0.5rem;
+}
+
+.bold {
+  font-style: italic;
 }
