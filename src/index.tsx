@@ -3,11 +3,12 @@ import ReactDOM from 'react-dom';
 import P5Draw from './P5Draw';
 import "./global.css";
 import staticExamples from './staticExamples';
+import InteractiveCreator from './InteractiveCreator';
 
 
 ReactDOM.render(
   <React.StrictMode>
-    {staticExamples()}
+    <InteractiveCreator />
   </React.StrictMode>,
   document.getElementById('root')
 );

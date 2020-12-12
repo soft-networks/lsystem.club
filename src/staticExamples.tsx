@@ -58,7 +58,7 @@ export default function staticExamples() {
         <div>
           <span className="bold">{example.name} </span><br />
           Axiom: {example.axiom} <br />
-          Productions : {example.productions} <br />
+          Productions : {example.productions.reduce((str, p) => (str + p + "  ,"), "")} <br />
           Iterations: {example.iterations}, Angle: {example.angle}, Length: {example.length}
         </div>)
       let egOutput = (

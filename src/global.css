@@ -10,3 +10,10 @@ body {
 .bold {
   font-style: italic;
 }
+
+.fc-green {
+  color: green;
+}
+.fc-red {
+  color: red;
+}
