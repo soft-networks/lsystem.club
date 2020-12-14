@@ -28,26 +28,30 @@ export default class P5Draw extends React.Component<myProps> {
       p.angleMode(p.DEGREES);
     };
     p.draw = () => {
-      p.translate(-p.width / 2, -p.height / 2);
-      let center = this.props.center !== undefined ? [p.width * this.props.center[0], p.height * this.props.center[1]] : [0, 0];
-      p.push();
-      p.background(255, 255, 255);
-      p.translate(center[0], center[1]);
-      p.noFill();
-      p.stroke(0, 0, 0);
-      let sw = this.props.strokeWeight || p.width / 1000;
-      p.strokeWeight(1);
-      if (this.props.commandString && this.props.commandString[0]) {
-        if ((this.props.commandString[0] as Letter).symbol) {
-          this.drawAxiom(p, this.props.commandString as Axiom);
-        } else {
-          this.drawString(p, this.props.commandString as string);
-        }
-      }
-      p.noLoop();
-      p.pop();
+      this.drawCS();
     };
   };
+  drawCS = (cS: string | Axiom = this.props.commandString) => {
+    let p = this.p5Context as p5;
+    p.translate(-p.width / 2, -p.height / 2);
+    let center = this.props.center !== undefined ? [p.width * this.props.center[0], p.height * this.props.center[1]] : [0, 0];
+    p.push();
+    p.background(255, 255, 255);
+    p.translate(center[0], center[1]);
+    p.noFill();
+    p.stroke(0, 0, 0);
+    let sw = this.props.strokeWeight || p.width / 1000;
+    p.strokeWeight(1);
+    if (this.props.commandString && this.props.commandString[0]) {
+      if ((this.props.commandString[0] as Letter).symbol) {
+        this.drawAxiom(p, this.props.commandString as Axiom);
+      } else {
+        this.drawString(p, this.props.commandString as string);
+      }
+    }
+    p.noLoop();
+    p.pop();
+  }
   drawString = (p: p5, cS: string) => {
     let length = this.props.length ? this.props.length * p.height : 0.01 * p.height;
     let angle = this.props.angle ? this.props.angle : 90;

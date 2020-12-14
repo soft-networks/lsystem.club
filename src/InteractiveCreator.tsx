@@ -1,25 +1,25 @@
 import React from "react"
 import lsystem, { Axiom, parseAxiom, Production } from "@bvk/lsystem"
-import { parsePredecessor, parseProduction } from "@bvk/lsystem/dist/parser";
+import { parsePredecessor, parseProduction, parseProductions } from "@bvk/lsystem/dist/parser";
 import LSystem from "@bvk/lsystem";
 import P5Draw from "./P5Draw";
 
 interface myState {
-  productions: Production[] | undefined,
-  axiom: Axiom | undefined,
+  productions: string[],
+  axiom: string,
   iterations: number,
 }
 
 export default class InteractiveCreator extends React.Component<{}, myState> {
   state: myState = {
-    productions: undefined,
-    axiom: undefined,
-    iterations: 1
+    productions: [],
+    axiom: "",
+    iterations: 3
   }
-  updateAxiom = (ax: Axiom) => {
-    this.setState({ axiom: ax });
+  updateAxiom = (axS: string) => {
+    this.setState({ axiom: axS });
   }
-  updateProductions = (productions: Production[]) => {
+  updateProductions = (productions: string[]) => {
     this.setState({ productions: productions });
   }
   getControls = () => {
@@ -67,7 +67,7 @@ export default class InteractiveCreator extends React.Component<{}, myState> {
     return (
       <div key="iterations">
         <label>Iterations </label>
-        <input type="range" min={0} max={10} step={1} value={this.state.iterations} onChange={this.updateIterationController} />
+        <input type="range" min={0} max={25} step={1} value={this.state.iterations} onChange={this.updateIterationController} />
       </div>
     )
   }
@@ -91,7 +91,7 @@ interface axState {
   axiomString: string,
   myError: string
 }
-class AxiomControl extends React.Component<{ onUpdate: (ax: Axiom) => void }, axState> {
+class AxiomControl extends React.Component<{ onUpdate: (axS: string) => void }, axState> {
   state: axState = {
     axiomString: "",
     myError: ""
@@ -105,7 +105,7 @@ class AxiomControl extends React.Component<{ onUpdate: (ax: Axiom) => void }, ax
     try {
       let axiom = parseAxiom(str);
       this.setState({ myError: "", axiomString: str });
-      this.props.onUpdate(axiom);
+      this.props.onUpdate(str);
     } catch (eR) {
       this.setState({ myError: eR.message, axiomString: str });
     }
@@ -125,15 +125,13 @@ class AxiomControl extends React.Component<{ onUpdate: (ax: Axiom) => void }, ax
 
 //PRODUCTION CONTROLLER
 interface pS {
-  productions: { [key: string]: Production | "not-created" },
+  productions: { [key: string]: string },
   numProductions: number
 }
-
 interface pP {
-  onUpdate: (productions: Production[]) => void
+  onUpdate: (productions: string[]) => void
 }
 class ProductionsControl extends React.Component<pP, pS> {
-
   constructor(props: pP) {
     super(props);
     this.state = {
@@ -157,12 +155,12 @@ class ProductionsControl extends React.Component<pP, pS> {
     });
     return productionControllers;
   }
-  updateProduction = (p: Production, k: string) => {
+  updateProduction = (pS: string, k: string) => {
     let prods = this.state.productions;
-    prods[k] = p;
+    prods[k] = pS;
     this.setState({ productions: prods });
-    let justProds = Object.values(prods).filter((p) => p != "not-created") as Production[];
-    this.props.onUpdate(justProds);
+    let nonEmptyProds = Object.values(prods).filter((p) => p != "") as string[];
+    this.props.onUpdate(nonEmptyProds);
   }
 
   removeProduction = (k: string) => {
@@ -185,7 +183,7 @@ interface productionState {
   myError: string
 }
 interface productionProps {
-  onUpdate: (p: Production, k: string) => void,
+  onUpdate: (pS: string, k: string) => void,
   id: string,
   destroyMe: (k: string) => void
 }
@@ -196,13 +194,12 @@ class ProductionControl extends React.Component<productionProps, productionState
     myError: ""
   }
 
-
   tryParseProduction = (e: React.ChangeEvent<HTMLInputElement>) => {
     let str = e.target.value;
     try {
       let production = parseProduction(str);
       this.setState({ myError: "", productionString: str });
-      this.props.onUpdate(production, this.props.id);
+      this.props.onUpdate(str, this.props.id);
     } catch (eR) {
       this.setState({ myError: eR.message, productionString: str });
     }
