@@ -9,6 +9,7 @@ import InteractiveCreator from './InteractiveCreator';
 ReactDOM.render(
   <React.StrictMode>
     <InteractiveCreator />
+    {/* {staticExamples()} */}
   </React.StrictMode>,
   document.getElementById('root')
 );

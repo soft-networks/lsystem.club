@@ -33,7 +33,7 @@ export default class InteractiveCreator extends React.Component<{}, myState> {
     let iterationControl = this.getIterationController();
     controls.push(iterationControl);
 
-    return <div style={{ display: "flex", flexDirection: "column" }}> {controls} </div>;
+    return <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}> {controls} </div>;
   }
   getOutput = () => {
     if (this.state.axiom && this.state.productions && this.state.productions.length > 0) {
@@ -48,15 +48,25 @@ export default class InteractiveCreator extends React.Component<{}, myState> {
         let lS = new LSystem(this.state.axiom, this.state.productions, this.state.iterations);
         let outputString = lS.getIterationAsString();
         let outputObjects = lS.getIterationAsObject();
-        console.log("****Gonna try and create a drawing with:" + outputString);
+        console.log("********************Re-initializing P5");
+        // console.log(this.state.productions);
+        // console.log(lS);
+        //console.log("****Gonna try and create a drawing with:" + outputString);
+        //console.log(lS.productions);
+
         let outputGFX = (<div> <P5Draw
           commandString={outputObjects}
           key={"lS-" + outputString}
           length={0.1}
-          center={[0.5, 0.5]} />
+          strokeWeight={4}
+          threeD={true}
+        />
         </div>)
-        return (<div style={{ display: "flex", flexDirection: "column" }}> {outputGFX} <div> {outputString} </div></div>)
+        return (<div style={{ display: "flex", flexDirection: "column" }}> {outputGFX}
+          <div style={{ width: 800 }}> {outputString} </div>
+        </div>)
       } catch (eR) {
+        console.log(eR);
         return <span className="fc-red">{eR.message} </span>
       }
     } else {
@@ -96,6 +106,7 @@ class AxiomControl extends React.Component<{ onUpdate: (axS: string) => void }, 
     axiomString: "",
     myError: ""
   }
+
 
   tryParseAxiom = (e: React.ChangeEvent<HTMLInputElement>) => {
     let str = e.target.value;

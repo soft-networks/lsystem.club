@@ -1,5 +1,9 @@
 body {
   background: rgb(224, 224, 224);
+}
+
+* {
+  box-sizing: border-box;
   font-family: monospace;
 }
 
@@ -16,4 +20,10 @@ body {
 }
 .fc-red {
   color: red;
+}
+
+input {
+  width: 300px;
+  height: 40px;
+  padding: 12px;
 }
