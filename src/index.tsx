@@ -4,6 +4,7 @@ import P5Draw from './P5Draw';
 import "./global.css";
 import staticExamples from './staticExamples';
 import InteractiveCreator from './InteractiveCreator';
+import LSCustomizer from './LSCustomizer';
 
 
 ReactDOM.render(

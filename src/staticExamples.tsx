@@ -1,5 +1,5 @@
 import P5Draw from "./P5Draw";
-import LSystem from "@bvk/lsystem";
+import LSystem, { Axiom } from "@bvk/lsystem";
 
 
 interface LExample {
@@ -10,7 +10,6 @@ interface LExample {
   length: number;
   iterations: number;
   center?: number[]
-  asObj?: boolean
   strokeWeight?: number
 }
 
@@ -25,18 +24,18 @@ export default function staticExamples() {
     },
     {
       name: "Koch Island",
-      axiom: "F-F-F-F", productions: [" F:F-F+F+FF-F-F+F"], asObj: true,
+      axiom: "F-F-F-F", productions: [" F:F-F+F+FF-F-F+F"],
       angle: 90, iterations: 4, length: 0.0021, center: [-0.25, 0.25], strokeWeight: 0.3
     },
     {
       name: "Simple tree",
       axiom: `-(90)FA(25)`,
-      productions: ["A(x): F[+(x)FA(0.9*x)][-(x)FA(0.9*x)]"], asObj: true,
+      productions: ["A(x): F[+(x)FA(0.9*x)][-(x)FA(0.9*x)]"],
       angle: 22.5, iterations: 5, length: 0.07, center: [0, 0.4]
     }, {
       name: "Plants with flowers",
       axiom: `-(90)A(8)`,
-      productions: ["A(x){x>1}:F[-B][+B]A(x-1)", "A(x){x<=1}: BE", "B: FF"], asObj: true,
+      productions: ["A(x){x>1}:F[-B][+B]A(x-1)", "A(x){x<=1}: BE", "B: FF"],
       angle: 30, iterations: 10, length: 0.05, center: [0, 0.4]
     }
   ]
@@ -44,7 +43,7 @@ export default function staticExamples() {
     let examplesDOM: JSX.Element[] = [];
     examples.forEach((example) => {
       let lS = new LSystem(example.axiom, example.productions, example.iterations);
-      let output = example.asObj ? lS.getIterationAsObject() : lS.getIterationAsString();
+      let output: Axiom = lS.getIterationAsObject();
 
       let egGraphic = (
         < div style={{ width: 500, height: 500, backgroundColor: "rgb(250,250,250)" }}>

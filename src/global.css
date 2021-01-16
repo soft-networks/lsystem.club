@@ -15,15 +15,28 @@ body {
   font-style: italic;
 }
 
-.fc-green {
-  color: green;
+.border-bottom {
+  border-bottom: 4px solid black;
 }
-.fc-red {
-  color: red;
+.red-border {
+  border-color: rgba(255, 0, 0);
+}
+.green-border {
+  border-color: rgb(0, 255, 0);
+}
+
+.subtext {
+  font-size: 80%;
+}
+
+.clickable {
+  color: blue;
 }
 
 input {
   width: 300px;
   height: 40px;
   padding: 12px;
+  outline: none;
+  border: none;
 }
