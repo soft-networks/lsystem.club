@@ -42,7 +42,7 @@ export default class LSCustomizer extends React.Component<CustomizerProps, Custo
   resetLS = () => {
     if (this.axiom && this.productions && this.productions.length > 0) {
       try {
-        let newLS = new LSystem(this.axiom, this.productions);
+        let newLS = new LSystem(this.axiom, this.productions, this.state.iterations);
         //TODO: ASYNC AWAIT
         newLS.iterate();
         this.setState({ errorMessage: "" });
