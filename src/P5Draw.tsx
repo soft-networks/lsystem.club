@@ -20,12 +20,16 @@ export default class P5Draw extends React.Component<myProps> {
   private p5Context: p5 | undefined;
   private containerRef;
   private container;
+  private p5Ready: boolean;
   constructor(props: myProps) {
     super(props);
     this.drawCS = this.drawCS.bind(this);
     this.sketch = this.sketch.bind(this);
     this.drawChar = this.drawChar.bind(this);
     this.redraw = this.redraw.bind(this);
+
+    //p5 Related functions 
+    this.p5Ready = false;
     this.containerRef = React.createRef<HTMLDivElement>();
     this.container = <div ref={this.containerRef} style={{ width: this.props.width || 800, height: this.props.height || 800, backgroundColor: "white" }} />;
   }
@@ -36,7 +40,7 @@ export default class P5Draw extends React.Component<myProps> {
     this.p5Context = new p5(this.sketch, node);
   }
   componentDidUpdate() {
-    if (this.p5Context) {
+    if (this.p5Context && this.p5Ready) {
       this.redraw();
     }
   }
@@ -46,6 +50,7 @@ export default class P5Draw extends React.Component<myProps> {
       p.createCanvas(this.props.width || 800, this.props.height || 800);
       p.angleMode(p.DEGREES);
       p.colorMode(p.HSB);
+      this.p5Ready = true;
       this.redraw();
     };
     p.draw = () => {
@@ -62,8 +67,6 @@ export default class P5Draw extends React.Component<myProps> {
       //Setup drawing
       let cS = this.props.commandString;
       let p = this.p5Context as p5;
-
-
 
       //Setup default values 
       let center = this.props.center !== undefined ? [p.width * this.props.center[0], p.height * this.props.center[1]] : [0, 0];

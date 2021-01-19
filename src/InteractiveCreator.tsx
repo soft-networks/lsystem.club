@@ -28,6 +28,9 @@ export default class InteractiveCreator extends React.Component<{}, InteractiveC
         <LSCustomizer
           onLSIterated={this.LSIterated}
           onLSReset={this.LSReset}
+          initAxiom={"A"}
+          initProductions={["A:FA"]}
+          initIterations={15}
         />
         <P5Draw commandString={this.state.currentlyDrawing} />
       </div>
