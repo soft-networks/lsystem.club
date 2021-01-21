@@ -1,16 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import P5Draw from './P5Draw';
+import P5Draw from './P5Turtle';
 import "./global.css";
 import staticExamples from './staticExamples';
-import InteractiveCreator from './InteractiveCreator';
+import InteractiveEditor from './InteractiveEditor';
 import LSCustomizer from './LSCustomizer';
 
 
 ReactDOM.render(
   <React.StrictMode>
-    <InteractiveCreator />
-    {/* {staticExamples()} */}
+    <InteractiveEditor />
+    {staticExamples()}
   </React.StrictMode>,
   document.getElementById('root')
 );

@@ -1,11 +1,9 @@
 
 import LSystem, { Axiom, parseAxiom, parseProduction, Production } from "@bvk/lsystem";
-import { axiomToStr } from "@bvk/lsystem/dist/parser";
 import React from "react"
-import { updateParenthesizedType } from "typescript";
 
 interface CustomizerProps {
-  onLSReset(LS: LSystem): void;
+  onLSReset(LS: LSystem, axString: string, producString: string[]): void;
   onLSIterated(LS: LSystem): void;
   initProductions?: string[],
   initAxiom?: string,
@@ -18,36 +16,59 @@ interface CustomizerState {
 }
 
 /**
+ * MAJOR TODOS:
+ * change error status system in LS Customizer
+ * implement async / await once it exists in package
+ * fix CSS obviously
+ * THE IDs in productions are incorrect, use a * function instead of what you're doing now
+ */
+
+/**
  * LSCustomizer stores the LSystem that is updated by the UI.
  * When the LSCustomizer updates the LSystem, or the iterations, it uses callback functions to update its parent
  */
 export default class LSCustomizer extends React.Component<CustomizerProps, CustomizerState> {
   LSystem: LSystem | undefined;
   axiom: Axiom | undefined;
+  axiomString: string | undefined;
   productions: Production[] | undefined;
+  productionStrings: string[] | undefined;
 
   state: CustomizerState = {
     iterations: this.props.initIterations || 1,
     errorMessage: ""
   }
   //Receive state from children, and update LSystem
-  updateAxiom = (ax: Axiom) => {
+  updateAxiom = (ax: Axiom, axString: string) => {
     this.axiom = ax;
+    this.axiomString = axString;
     this.resetLS();
   }
-  updateProductions = (productions: Production[]) => {
+  updateProductions = (productions: Production[], productionStrings: string[]) => {
     this.productions = productions;
+    this.productionStrings = productionStrings;
     this.resetLS();
+  }
+  getText = () => {
+    let text = "";
+    if (this.axiomString)
+      text += this.axiomString + "\n";
+    if (this.productionStrings)
+      this.productionStrings?.forEach((p) => { text += p + "\n" })
+    return text
   }
   resetLS = () => {
     if (this.axiom && this.productions && this.productions.length > 0) {
       try {
         let newLS = new LSystem(this.axiom, this.productions, this.state.iterations);
         //TODO: ASYNC AWAIT
+        //Loading spinner here
         newLS.iterate();
-        this.setState({ errorMessage: "" });
-        this.props.onLSReset(newLS);
+        //End loading spinner when its done....
+        this.props.onLSReset(newLS, this.axiomString as string, this.productionStrings as string[]);
         this.LSystem = newLS;
+        this.setState({ errorMessage: "" });
+
       } catch (e) {
         this.setState({ errorMessage: e.message });
       }
@@ -63,35 +84,41 @@ export default class LSCustomizer extends React.Component<CustomizerProps, Custo
       return;
     }
     //TODO: ASYNC/AWAIT
-    this.LSystem.setIterations(newValue);
-    this.LSystem.iterate();
-    this.props.onLSIterated(this.LSystem);
+    try {
+      this.LSystem.setIterations(newValue);
+      this.LSystem.iterate();
+      this.props.onLSIterated(this.LSystem);
+      this.setState({ errorMessage: "" })
+    } catch (e) {
+      this.setState({ errorMessage: e.message })
+    }
   }
 
   //Generate UI
   getControls = () => {
-    let controls = [];
-    let axiomControl = <AxiomCustomizer didUpdate={this.updateAxiom} key={"axiom-controls"} initAxiom={this.props.initAxiom} />
-    controls.push(axiomControl);
-    let productionsControl = <ManyProductionCustomizer didUpdate={this.updateProductions} key={"production-controls"} initProductions={this.props.initProductions} />
-    controls.push(productionsControl);
     let iterationControl = this.getIterationController();
+    let refreshController = (<span className="clickable" onClick={(e) => this.resetLS()}> force refresh </span>);
+    let axiomControl = <AxiomCustomizer didUpdate={this.updateAxiom} key={"axiom-controls"} initAxiom={this.props.initAxiom} />
+    let productionsControl = <ManyProductionCustomizer didUpdate={this.updateProductions} key={"production-controls"} initProductions={this.props.initProductions} />
+    let controls = [];
     controls.push(iterationControl);
+    controls.push(refreshController);
+    controls.push(axiomControl);
+    controls.push(productionsControl);
     return <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}> {controls} </div>;
   }
   getIterationController = () => {
     return (
       <div key="iterations">
         <label> Iterations </label>
-        <input type="range" min={1} max={20} onChange={this.updateIterations} value={this.state.iterations} />
+        <input type="number" onChange={this.updateIterations} value={this.state.iterations} />
       </div>
     )
   }
   render = () => {
     return (
       <div>
-        <div> LSystem </div>
-        <div className="subtext">{this.state.errorMessage}</div>
+        <div>Status: {this.state.errorMessage === "" ? "✅" : "🛑 " + this.state.errorMessage}</div>
         <div> {this.getControls()} </div>
       </div>)
   }
@@ -103,7 +130,7 @@ export default class LSCustomizer extends React.Component<CustomizerProps, Custo
 */
 interface AxiomProps {
   initAxiom?: string;
-  didUpdate(ax: Axiom): void;
+  didUpdate(ax: Axiom, axString: string): void;
 }
 interface AxiomState {
   axiomString: string;
@@ -124,7 +151,7 @@ export class AxiomCustomizer extends React.Component<AxiomProps, AxiomState> {
     try {
       let axiomObj = parseAxiom(axiomString);
       this.setState({ axiomParses: true, errorMessage: "" });
-      this.props.didUpdate(axiomObj);
+      this.props.didUpdate(axiomObj, axiomString);
     } catch (e) {
       this.setState({ axiomParses: false, errorMessage: e.message });
     }
@@ -146,7 +173,7 @@ export class AxiomCustomizer extends React.Component<AxiomProps, AxiomState> {
 */
 interface ManyProductionProps {
   initProductions?: string[],
-  didUpdate(productions: Production[]): void
+  didUpdate(productions: Production[], productionString: string[]): void
 }
 interface ManyProductionState {
   productionStrDict: { [key: string]: string },
@@ -187,9 +214,14 @@ export class ManyProductionCustomizer extends React.Component<ManyProductionProp
       let npv = { ...pv };
       copiedvalues.push(npv);
     })
+    let correctKeys = Object.keys(this.productionObjDict);
+    let productionStrings: string[] = [];
+    correctKeys.forEach((key) => {
+      productionStrings.push(this.state.productionStrDict[key]);
+    })
     console.log("ProductionCuztomizer sending back to parent");
     console.log(productions);
-    this.props.didUpdate(copiedvalues);
+    this.props.didUpdate(copiedvalues, productionStrings);
   }
   updateProduction = (productionString: string, productionKey: string) => {
     console.log("Updating: " + productionString + " with key " + productionKey);
@@ -233,14 +265,20 @@ export class ManyProductionCustomizer extends React.Component<ManyProductionProp
     return productionKeys.map((pKey, index) => {
       let pString = this.state.productionStrDict[pKey];
       let productionInput = (
-        <div key={pKey} >
-          <label> Production {index} </label>
-          <input key={pKey + "-input"}
-            className={`padded border-bottom ${this.state.errorMessages[pKey] ? 'red-border' : 'green-border'}`}
-            onChange={(e) => this.updateProduction(e.target.value, pKey)}
-            value={pString} />
-          <div className="clickable right-button"
-            onClick={(e) => this.removeProduction(pKey)}> (-) </div>
+        <div key={pKey} style={{ display: "flex", flexDirection: "column", gap: "12px" }} >
+          <div>
+            <label> Prod {index}
+              <span className="clickable right-button"
+                onClick={(e) => this.removeProduction(pKey)}>
+                (-)
+                </span>
+            </label>
+            <input key={pKey + "-input"}
+              className={`padded border-bottom ${this.state.errorMessages[pKey] ? 'red-border' : 'green-border'}`}
+              onChange={(e) => this.updateProduction(e.target.value, pKey)}
+              value={pString} />
+
+          </div>
           <div className="red subtext"> {this.state.errorMessages[pKey]} </div>
         </div>);
       return productionInput;

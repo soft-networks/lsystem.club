@@ -1,22 +1,17 @@
 import React from "react"
 import p5 from "p5"
-import { Axiom, Letter, ParamsValue } from "@bvk/lsystem";
+import LSystem, { Axiom, Letter, ParamsValue } from "@bvk/lsystem";
 import { Dw } from "./lib/easyCam";
 import { Console } from "console";
 import { textSpanIntersectsWithTextSpan } from "typescript";
+import { GFXProps } from "./utils";
 
 
 interface myProps {
-  commandString: Axiom | undefined;
-  length?: number;
-  angle?: number;
-  center?: number[];
-  width?: number;
-  height?: number;
-  strokeWeight?: number;
-  threeD?: boolean
+  LSystem: LSystem | undefined;
+  GFXProps?: GFXProps
 }
-export default class P5Draw extends React.Component<myProps> {
+export default class P5Turtle extends React.Component<myProps> {
   private p5Context: p5 | undefined;
   private containerRef;
   private container;
@@ -31,7 +26,8 @@ export default class P5Draw extends React.Component<myProps> {
     //p5 Related functions 
     this.p5Ready = false;
     this.containerRef = React.createRef<HTMLDivElement>();
-    this.container = <div ref={this.containerRef} style={{ width: this.props.width || 800, height: this.props.height || 800, backgroundColor: "white" }} />;
+
+    this.container = <div ref={this.containerRef} style={{ width: this.props.GFXProps?.width || 800, height: this.props.GFXProps?.height || 800, backgroundColor: "white" }} />;
   }
   componentDidMount() {
     let node = this.containerRef.current;
@@ -47,7 +43,7 @@ export default class P5Draw extends React.Component<myProps> {
   sketch(p: p5) {
     p.setup = () => {
       console.log("🤡🤡🤡🤡🤡  creating sketch")
-      p.createCanvas(this.props.width || 800, this.props.height || 800);
+      p.createCanvas(this.props.GFXProps?.width || 800, this.props.GFXProps?.height || 800);
       p.angleMode(p.DEGREES);
       p.colorMode(p.HSB);
       this.p5Ready = true;
@@ -63,16 +59,17 @@ export default class P5Draw extends React.Component<myProps> {
     this.p5Context?.noLoop();
   }
   drawCS() {
-    if (this.props.commandString !== undefined && this.p5Context !== undefined) {
+
+    if (this.props.LSystem !== undefined && this.p5Context !== undefined) {
       //Setup drawing
-      let cS = this.props.commandString;
+      let cS = this.props.LSystem.getIterationAsObject();
       let p = this.p5Context as p5;
 
       //Setup default values 
-      let center = this.props.center !== undefined ? [p.width * this.props.center[0], p.height * this.props.center[1]] : [0, 0];
-      let sw = this.props.strokeWeight ? this.props.strokeWeight : 1;
-      let defaultLength = this.props.length ? this.props.length * p.height : 0.01 * p.height;
-      let defaultAngle = this.props.angle ? this.props.angle : 90;
+      let center = this.props.GFXProps?.center !== undefined ? [p.width * this.props.GFXProps?.center[0], p.height * this.props.GFXProps?.center[1]] : [0, 0];
+      let sw = this.props.GFXProps?.strokeWeight ? this.props.GFXProps?.strokeWeight : 1;
+      let defaultLength = this.props.GFXProps?.length ? this.props.GFXProps?.length * p.height : 0.01 * p.height;
+      let defaultAngle = this.props.GFXProps?.angle ? this.props.GFXProps?.angle : 90;
 
       //Begin drawing
       p.push();

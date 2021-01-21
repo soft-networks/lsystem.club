@@ -33,6 +33,11 @@ body {
   color: blue;
 }
 
+.side-by-side {
+  display: flex;
+  flex-direction: column;
+}
+
 input {
   width: 300px;
   height: 40px;
