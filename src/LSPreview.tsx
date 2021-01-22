@@ -38,7 +38,11 @@ export class LSPreview extends React.Component<LSPreviewProps, LSPreviewState>{
               onChange={this.updateIterations}
             />
           </div>
-          <div className="clickable"> <Link to={`/edit${encodeParams(this.props.axiomText, this.props.productionsText)}`}> edit </Link> </div>
+          <div className="clickable">
+            <Link to={`/edit${encodeParams(this.props.axiomText, this.props.productionsText, this.props.gfxprops)}`}>
+              edit
+            </Link>
+          </div>
         </div>
         <P5Turtle LSystem={this.state.currentLS} GFXProps={this.props.gfxprops} />
       </div>)

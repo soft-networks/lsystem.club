@@ -1,5 +1,5 @@
 body {
-  background: rgb(224, 224, 224);
+  background: rgb(250, 250, 250);
 }
 
 * {
@@ -31,6 +31,7 @@ body {
 
 .clickable {
   color: blue;
+  cursor: pointer;
 }
 
 .side-by-side {
@@ -44,4 +45,5 @@ input {
   padding: 12px;
   outline: none;
   border: none;
+  border: 1px solid rgb(240, 240, 250);
 }

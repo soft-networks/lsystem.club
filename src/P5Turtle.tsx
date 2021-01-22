@@ -13,54 +13,50 @@ interface myProps {
 }
 export default class P5Turtle extends React.Component<myProps> {
   private p5Context: p5 | undefined;
-  private containerRef;
-  private container;
-  private p5Ready: boolean;
+  private containerRef = React.createRef<HTMLDivElement>();
   constructor(props: myProps) {
     super(props);
     this.drawCS = this.drawCS.bind(this);
-    this.sketch = this.sketch.bind(this);
     this.drawChar = this.drawChar.bind(this);
     this.redraw = this.redraw.bind(this);
-
-    //p5 Related functions 
-    this.p5Ready = false;
-    this.containerRef = React.createRef<HTMLDivElement>();
-
-    this.container = <div ref={this.containerRef} style={{ width: this.props.GFXProps?.width || 800, height: this.props.GFXProps?.height || 800, backgroundColor: "white" }} />;
   }
   componentDidMount() {
-    let node = this.containerRef.current;
-    if (!node)
-      throw Error("Reference node doesnt exist");
-    this.p5Context = new p5(this.sketch, node);
+    if (this.containerRef.current)
+      new p5(this.sketch, this.containerRef.current);
   }
   componentDidUpdate() {
-    if (this.p5Context && this.p5Ready) {
-      this.redraw();
-    }
+    this.redraw();
   }
-  sketch(p: p5) {
+  sketch = (p: p5) => {
     p.setup = () => {
-      console.log("🤡🤡🤡🤡🤡  creating sketch")
       p.createCanvas(this.props.GFXProps?.width || 800, this.props.GFXProps?.height || 800);
       p.angleMode(p.DEGREES);
       p.colorMode(p.HSB);
-      this.p5Ready = true;
+      p.noLoop();
+      this.p5Context = p;
       this.redraw();
     };
     p.draw = () => {
-      p.noLoop();
+
     }
   };
+  componentWillUnmount = () => {
+    this.p5Context?.remove();
+    this.p5Context = undefined;
+  }
   redraw() {
-    this.p5Context?.background(0, 0, 90);
-    this.drawCS();
-    this.p5Context?.noLoop();
+    if (this.p5Context !== undefined) {
+      this.p5Context?.clear();
+      this.p5Context?.background(0, 0, 90);
+      this.drawCS();
+      this.p5Context?.noLoop();
+    } else {
+      console.log("Couldnt redraw");
+      console.log(this.p5Context);
+    }
   }
   drawCS() {
-
-    if (this.props.LSystem !== undefined && this.p5Context !== undefined) {
+    if (this.props.LSystem !== undefined) {
       //Setup drawing
       let cS = this.props.LSystem.getIterationAsObject();
       let p = this.p5Context as p5;
@@ -128,7 +124,7 @@ export default class P5Turtle extends React.Component<myProps> {
   }
 
   render() {
-    return this.container
+    return <div ref={this.containerRef} style={{ width: this.props.GFXProps?.width || 800, height: this.props.GFXProps?.height || 800, backgroundColor: "white" }} />;
   }
 
 }

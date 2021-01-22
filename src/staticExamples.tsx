@@ -21,14 +21,17 @@ export default function staticExamples() {
       gfxprops: { angle: 60, length: 0.003, center: [-0.4, -0.1] }
     },
     {
-      name: "Koch Island",
-      axiom: "F-F-F-F", productions: [" F:F-F+F+FF-F-F+F"], iterations: 2,
-      gfxprops: { angle: 90, length: 0.0021, center: [-0.25, 0.25], strokeWeight: 0.3 }
-    },
-    {
       name: "Spiral",
       axiom: "A", productions: ["A:FB + A", "B:[-(90)FF]"], iterations: 4,
       gfxprops: { angle: 5 }
+    },
+    {
+      name: "Beautiful octopus",
+      axiom: "A(10,50)", productions: ["A(a,w){w>0}: F @(w) !(w) +(a) C(w) A(a,w-0.5)", "B(b): @(b) F B(b+1)", "C(w): [!(w/2) -B(w)]", "A(a,w){w<0}:X"], iterations: 30
+    },
+    {
+      name: "Plant Gradient",
+      axiom: "- [A(5)]", productions: ["A(a): @(a*1.5) FFF I(40) +(rnd(0,10))  A(a+1) E(4)", "I(a): [-(a)B] [+(a)B]", "B:FBE(4)", "B:I(rnd(0,10))"], iterations: 11
     },
     {
       name: "Simple tree",
@@ -44,17 +47,18 @@ export default function staticExamples() {
   ]
   function drawExamples() {
     let examplesDOM: JSX.Element[] = [];
-    examples.forEach((example) => {
+    examples.forEach((example, index) => {
       let lS = new LSystem(example.axiom, example.productions, example.iterations);
       let preview = (<LSPreview
         LSystem={lS}
         axiomText={example.axiom}
         productionsText={example.productions}
         gfxprops={example.gfxprops}
+        key={"eg" + example.name}
       />);
       examplesDOM.push(preview);
     });
-    return (<div style={{ display: "flex", flexDirection: "row", gap: "12px" }}> {examplesDOM} </div>)
+    return (<div style={{ display: "flex", flexDirection: "column", gap: "32px" }}> {examplesDOM} </div>)
   }
   return drawExamples()
 }

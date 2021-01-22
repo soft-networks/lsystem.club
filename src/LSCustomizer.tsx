@@ -1,13 +1,16 @@
 
 import LSystem, { Axiom, parseAxiom, parseProduction, Production } from "@bvk/lsystem";
 import React from "react"
+import { GFXProps } from "./utils";
 
 interface CustomizerProps {
   onLSReset(LS: LSystem, axString: string, producString: string[]): void;
   onLSIterated(LS: LSystem): void;
+  onGFXPropsUpdate(gfxProps: GFXProps): void;
   initProductions?: string[],
   initAxiom?: string,
-  initIterations?: number
+  initIterations?: number,
+  initGFXProps?: GFXProps
 }
 
 interface CustomizerState {
@@ -49,14 +52,6 @@ export default class LSCustomizer extends React.Component<CustomizerProps, Custo
     this.productionStrings = productionStrings;
     this.resetLS();
   }
-  getText = () => {
-    let text = "";
-    if (this.axiomString)
-      text += this.axiomString + "\n";
-    if (this.productionStrings)
-      this.productionStrings?.forEach((p) => { text += p + "\n" })
-    return text
-  }
   resetLS = () => {
     if (this.axiom && this.productions && this.productions.length > 0) {
       try {
@@ -83,7 +78,6 @@ export default class LSCustomizer extends React.Component<CustomizerProps, Custo
       this.setState({ errorMessage: "cant iterate an LSystem doesnt exist yet" });
       return;
     }
-    //TODO: ASYNC/AWAIT
     try {
       this.LSystem.setIterations(newValue);
       this.LSystem.iterate();
@@ -97,9 +91,10 @@ export default class LSCustomizer extends React.Component<CustomizerProps, Custo
   //Generate UI
   getControls = () => {
     let iterationControl = this.getIterationController();
-    let refreshController = (<span className="clickable" onClick={(e) => this.resetLS()}> force refresh </span>);
+    let refreshController = (<span className="clickable" onClick={(e) => this.resetLS()} key="refresh-control"> force refresh </span>);
     let axiomControl = <AxiomCustomizer didUpdate={this.updateAxiom} key={"axiom-controls"} initAxiom={this.props.initAxiom} />
-    let productionsControl = <ManyProductionCustomizer didUpdate={this.updateProductions} key={"production-controls"} initProductions={this.props.initProductions} />
+    let productionsControl = <ProductionsCustomizer didUpdate={this.updateProductions} key={"production-controls"} initProductions={this.props.initProductions} />
+
     let controls = [];
     controls.push(iterationControl);
     controls.push(refreshController);
@@ -107,9 +102,10 @@ export default class LSCustomizer extends React.Component<CustomizerProps, Custo
     controls.push(productionsControl);
     return <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}> {controls} </div>;
   }
+
   getIterationController = () => {
     return (
-      <div key="iterations">
+      <div key="iteration-control">
         <label> Iterations </label>
         <input type="number" onChange={this.updateIterations} value={this.state.iterations} />
       </div>
@@ -120,14 +116,16 @@ export default class LSCustomizer extends React.Component<CustomizerProps, Custo
       <div>
         <div>Status: {this.state.errorMessage === "" ? "✅" : "🛑 " + this.state.errorMessage}</div>
         <div> {this.getControls()} </div>
+        <div>
+          <GFXPropsCustomizer gfxProps={this.props.initGFXProps || {}}
+            GFXPropsUpdated={this.props.onGFXPropsUpdate} />
+        </div>
       </div>)
   }
 }
 
+//AxiomCustomizer.js
 
-/**
- * AxiomCustomizer controls updating of the Axiom
-*/
 interface AxiomProps {
   initAxiom?: string;
   didUpdate(ax: Axiom, axString: string): void;
@@ -137,7 +135,7 @@ interface AxiomState {
   errorMessage: string;
   axiomParses: boolean;
 }
-export class AxiomCustomizer extends React.Component<AxiomProps, AxiomState> {
+class AxiomCustomizer extends React.Component<AxiomProps, AxiomState> {
   state: AxiomState = {
     axiomString: this.props.initAxiom || "",
     axiomParses: false,
@@ -168,9 +166,7 @@ export class AxiomCustomizer extends React.Component<AxiomProps, AxiomState> {
   }
 }
 
-/**
- * ManyProductionCustomizer controls updating of the Axiom
-*/
+//ProductionsCustomizer.js
 interface ManyProductionProps {
   initProductions?: string[],
   didUpdate(productions: Production[], productionString: string[]): void
@@ -179,7 +175,7 @@ interface ManyProductionState {
   productionStrDict: { [key: string]: string },
   errorMessages: { [key: string]: string }
 }
-export class ManyProductionCustomizer extends React.Component<ManyProductionProps, ManyProductionState> {
+class ProductionsCustomizer extends React.Component<ManyProductionProps, ManyProductionState> {
   productionObjDict: { [key: string]: Production } = {};
   constructor(props: ManyProductionProps) {
     super(props);
@@ -290,4 +286,35 @@ export class ManyProductionCustomizer extends React.Component<ManyProductionProp
       <div className="clickable" onClick={this.addProduction}>Add production</div>
     </div>)
   }
+}
+
+//GFXPropsCustomizer.js
+class GFXPropsCustomizer extends React.Component<{ gfxProps: GFXProps, GFXPropsUpdated(gfxProps: GFXProps): void }, GFXProps> {
+  state: GFXProps = {
+    length: this.props.gfxProps.length || 10,
+    angle: this.props.gfxProps.angle || 10,
+  }
+  updateAngle = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let newAngle = parseFloat(e.target.value);
+    let newState = this.state;
+    newState.angle = newAngle;
+    this.setState(newState);
+    this.props.GFXPropsUpdated(newState);
+  }
+  updateLength = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let newLength = parseFloat(e.target.value);
+    let newState = this.state;
+    newState.length = newLength;
+    this.setState(newState);
+    this.props.GFXPropsUpdated(newState);
+  }
+  getControls = () => {
+    let angleControl = (<div key="customize-angle" > <label> Angle </label><input value={this.state.angle} onChange={this.updateAngle} type="number" /></div>)
+    let lengthControl = (<div key="customize-length"> <label> Length </label><input value={this.state.length} onChange={this.updateLength} type="number" /></div>)
+    return [angleControl, lengthControl]
+  }
+  render = () => {
+    return this.getControls();
+  }
+
 }

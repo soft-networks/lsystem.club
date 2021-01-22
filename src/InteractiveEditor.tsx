@@ -3,13 +3,14 @@ import { CopyToClipboard } from "react-copy-to-clipboard"
 import LSystem from "@bvk/lsystem";
 import P5Turtle from "./P5Turtle";
 import LSCustomizer from "./LSCustomizer";
-import { decodeParams, flattenText } from "./utils"
+import { decodeParams, flattenText, GFXProps } from "./utils"
 import { RouteComponentProps } from "react-router-dom";
 
 interface InteractiveCreatorState {
   currentlyDrawing: LSystem | undefined,
   axiomOverride: string,
-  productionOverrides: string[]
+  productionOverrides: string[],
+  gfxProps?: GFXProps,
   pasteOpen: boolean;
 }
 interface PathParams {
@@ -17,29 +18,28 @@ interface PathParams {
 }
 export default class InteractiveEditor extends React.Component<RouteComponentProps<PathParams>, InteractiveCreatorState> {
   copyText: string = "";
-  state = {
-    currentlyDrawing: undefined,
+  initGfxProps: GFXProps | undefined; //TODO: This is messy, and the solution is to "lift" the param -> Customizer + Renderer conversion into its own thingy...
+  state: InteractiveCreatorState = {
+    currentlyDrawing: new LSystem("A", ["A:FA"], 2),
     axiomOverride: "A",
     productionOverrides: ["A:FA"],
     pasteOpen: false
   }
   componentDidMount() {
-    console.log("HEYYYYY we're in the location section");
-    console.log(this.props.location.search);
-    let { axiom, productions } = decodeParams(this.props.location.search);
+    let { axiom, productions, gfxProps } = decodeParams(this.props.location.search);
     let newState = this.state;
     if (axiom) newState.axiomOverride = axiom;
     if (productions) newState.productionOverrides = productions;
+    if (gfxProps) {
+      newState.gfxProps = gfxProps;
+      this.initGfxProps = gfxProps;
+    }
     this.setState(newState)
   }
   LSIterated = (LS: LSystem) => {
-    console.log("LS Iterated");
-    console.log(LS.getIterationAsString());
     this.setState({ currentlyDrawing: LS })
   }
   LSReset = (LS: LSystem, axString: string, productionString: string[]) => {
-    console.log("LS Reset");
-    console.log(LS.getIterationAsString());
     this.setState({ currentlyDrawing: LS });
     this.copyText = flattenText([axString, ...productionString], "\n");
   }
@@ -70,12 +70,14 @@ export default class InteractiveEditor extends React.Component<RouteComponentPro
         <LSCustomizer
           onLSIterated={this.LSIterated}
           onLSReset={this.LSReset}
+          onGFXPropsUpdate={(newprops) => this.setState({ gfxProps: newprops })}
           initAxiom={this.state.axiomOverride}
           initProductions={this.state.productionOverrides}
+          initGFXProps={this.initGfxProps}
           key={flattenText([this.state.axiomOverride, ...this.state.productionOverrides], "-")}
-          initIterations={5}
+          initIterations={2}
         />
-        <P5Turtle LSystem={this.state.currentlyDrawing} />
+        <P5Turtle LSystem={this.state.currentlyDrawing} GFXProps={this.state.gfxProps} />
       </div >
     )
   }
