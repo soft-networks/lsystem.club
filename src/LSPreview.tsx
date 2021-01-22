@@ -1,11 +1,13 @@
 import LSystem from "@bvk/lsystem";
 import React from "react";
+import { Link } from "react-router-dom";
 import P5Turtle from "./P5Turtle";
-import { GFXProps } from "./utils";
+import { encodeParams, GFXProps } from "./utils";
 
 interface LSPreviewProps {
   LSystem: LSystem,
-  LSText: string,
+  axiomText: string,
+  productionsText: string[],
   gfxprops?: GFXProps
 }
 interface LSPreviewState {
@@ -26,7 +28,7 @@ export class LSPreview extends React.Component<LSPreviewProps, LSPreviewState>{
     return (
       <div className="side-by-side">
         <div>
-          <div> {this.props.LSText} </div>
+          <div> axiom {this.props.axiomText} and productions: {this.props.productionsText} </div>
           <div>
             <label>
               iterations: {this.state.currentLS.iterations}
@@ -36,7 +38,7 @@ export class LSPreview extends React.Component<LSPreviewProps, LSPreviewState>{
               onChange={this.updateIterations}
             />
           </div>
-          <div className="clickable"> edit </div>
+          <div className="clickable"> <Link to={`/edit${encodeParams(this.props.axiomText, this.props.productionsText)}`}> edit </Link> </div>
         </div>
         <P5Turtle LSystem={this.state.currentLS} GFXProps={this.props.gfxprops} />
       </div>)

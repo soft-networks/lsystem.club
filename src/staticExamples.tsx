@@ -17,13 +17,18 @@ export default function staticExamples() {
   const examples: LExample[] = [
     {
       name: "Koch Curve",
-      axiom: "F", productions: [" F:F+F--F+F"],
+      axiom: "F", productions: [" F:F+F--F+F"], iterations: 5,
       gfxprops: { angle: 60, length: 0.003, center: [-0.4, -0.1] }
     },
     {
       name: "Koch Island",
-      axiom: "F-F-F-F", productions: [" F:F-F+F+FF-F-F+F"], iterations: 4,
+      axiom: "F-F-F-F", productions: [" F:F-F+F+FF-F-F+F"], iterations: 2,
       gfxprops: { angle: 90, length: 0.0021, center: [-0.25, 0.25], strokeWeight: 0.3 }
+    },
+    {
+      name: "Spiral",
+      axiom: "A", productions: ["A:FB + A", "B:[-(90)FF]"], iterations: 4,
+      gfxprops: { angle: 5 }
     },
     {
       name: "Simple tree",
@@ -43,7 +48,8 @@ export default function staticExamples() {
       let lS = new LSystem(example.axiom, example.productions, example.iterations);
       let preview = (<LSPreview
         LSystem={lS}
-        LSText={flattenText([example.axiom, ...example.productions], "\n")}
+        axiomText={example.axiom}
+        productionsText={example.productions}
         gfxprops={example.gfxprops}
       />);
       examplesDOM.push(preview);

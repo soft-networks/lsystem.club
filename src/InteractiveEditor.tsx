@@ -3,20 +3,34 @@ import { CopyToClipboard } from "react-copy-to-clipboard"
 import LSystem from "@bvk/lsystem";
 import P5Turtle from "./P5Turtle";
 import LSCustomizer from "./LSCustomizer";
-import { flattenText } from "./utils"
-
+import { decodeParams, flattenText } from "./utils"
+import { RouteComponentProps } from "react-router-dom";
 
 interface InteractiveCreatorState {
   currentlyDrawing: LSystem | undefined,
-  pasteOverrideText: string[],
+  axiomOverride: string,
+  productionOverrides: string[]
   pasteOpen: boolean;
 }
-export default class InteractiveEditor extends React.Component<{}, InteractiveCreatorState> {
+interface PathParams {
+  LSStr: string
+}
+export default class InteractiveEditor extends React.Component<RouteComponentProps<PathParams>, InteractiveCreatorState> {
   copyText: string = "";
   state = {
     currentlyDrawing: undefined,
-    pasteOverrideText: ["A", "A:FA"],
+    axiomOverride: "A",
+    productionOverrides: ["A:FA"],
     pasteOpen: false
+  }
+  componentDidMount() {
+    console.log("HEYYYYY we're in the location section");
+    console.log(this.props.location.search);
+    let { axiom, productions } = decodeParams(this.props.location.search);
+    let newState = this.state;
+    if (axiom) newState.axiomOverride = axiom;
+    if (productions) newState.productionOverrides = productions;
+    this.setState(newState)
   }
   LSIterated = (LS: LSystem) => {
     console.log("LS Iterated");
@@ -28,6 +42,12 @@ export default class InteractiveEditor extends React.Component<{}, InteractiveCr
     console.log(LS.getIterationAsString());
     this.setState({ currentlyDrawing: LS });
     this.copyText = flattenText([axString, ...productionString], "\n");
+  }
+  setTextFromPaste = (t: string) => {
+    let stringArray = t.split("\n").filter(r => r != "");
+    let axiomOverride = stringArray[0];
+    let productionOverrides = stringArray.slice(1);
+    this.setState({ axiomOverride: axiomOverride, productionOverrides: productionOverrides, pasteOpen: false })
   }
   render() {
     return (
@@ -43,17 +63,16 @@ export default class InteractiveEditor extends React.Component<{}, InteractiveCr
               onClick={(e) => this.setState({ pasteOpen: !this.state.pasteOpen })}>
               override {this.state.pasteOpen ? "-" : "+"}
             </span>
-            {this.state.pasteOpen ?
-              <TextInput onSubmit={(t) => this.setState({ pasteOverrideText: t.split("\n").filter(r => r != ""), pasteOpen: false })} />
-              : ""}
+            {this.state.pasteOpen &&
+              <TextInput onSubmit={this.setTextFromPaste} />}
           </div>
         </div>
         <LSCustomizer
           onLSIterated={this.LSIterated}
           onLSReset={this.LSReset}
-          initAxiom={this.state.pasteOverrideText[0]}
-          initProductions={this.state.pasteOverrideText.slice(1)}
-          key={flattenText(this.state.pasteOverrideText, "-")}
+          initAxiom={this.state.axiomOverride}
+          initProductions={this.state.productionOverrides}
+          key={flattenText([this.state.axiomOverride, ...this.state.productionOverrides], "-")}
           initIterations={5}
         />
         <P5Turtle LSystem={this.state.currentlyDrawing} />

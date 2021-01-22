@@ -1,16 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import P5Draw from './P5Turtle';
 import "./global.css";
-import staticExamples from './staticExamples';
-import InteractiveEditor from './InteractiveEditor';
-import LSCustomizer from './LSCustomizer';
-
+import { Home } from './Home';
+import { BrowserRouter as Router } from "react-router-dom";
 
 ReactDOM.render(
   <React.StrictMode>
-    <InteractiveEditor />
-    {staticExamples()}
+    <Router>
+      <Home></Home>
+    </Router>
   </React.StrictMode>,
   document.getElementById('root')
 );
