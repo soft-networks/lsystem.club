@@ -1,8 +1,20 @@
-
+import InteractiveEditor from './EditorPage';
+import { Route } from "react-router-dom"
 import LSystem from "@bvk/lsystem";
-import { LSPreview } from "./LSPreview";
-import { flattenText, GFXProps } from "./utils"
+import { LSPreview } from "../components/LSPreview";
+import { GFXProps } from "../components/utils"
 
+export default function Home(): JSX.Element {
+  return (
+    <div>
+      <Route path="/edit" component={InteractiveEditor} />
+      <Route exact path="/" render={staticExamples} />
+    </div>
+  )
+}
+
+
+//staticExamples.js
 
 interface LExample {
   name: string;
@@ -12,7 +24,7 @@ interface LExample {
   gfxprops?: GFXProps
 }
 
-export default function staticExamples() {
+function staticExamples() {
 
   const examples: LExample[] = [
     {

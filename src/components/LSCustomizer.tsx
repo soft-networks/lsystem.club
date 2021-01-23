@@ -1,10 +1,12 @@
 
 import LSystem, { Axiom, parseAxiom, parseProduction, Production } from "@bvk/lsystem";
 import React from "react"
-import { GFXProps } from "./utils";
+import CopyToClipboard from "react-copy-to-clipboard";
+import { Link } from "react-router-dom";
+import { encodeParams, flattenText, GFXProps } from "./utils";
 
 interface CustomizerProps {
-  onLSReset(LS: LSystem, axString: string, producString: string[]): void;
+  onLSReset(LS: LSystem): void;
   onLSIterated(LS: LSystem): void;
   onGFXPropsUpdate(gfxProps: GFXProps): void;
   initProductions?: string[],
@@ -16,6 +18,8 @@ interface CustomizerProps {
 interface CustomizerState {
   iterations: number,
   errorMessage: string,
+  axiomString: string,
+  productionStrings: string[]
 }
 
 /**
@@ -33,23 +37,24 @@ interface CustomizerState {
 export default class LSCustomizer extends React.Component<CustomizerProps, CustomizerState> {
   LSystem: LSystem | undefined;
   axiom: Axiom | undefined;
-  axiomString: string | undefined;
   productions: Production[] | undefined;
-  productionStrings: string[] | undefined;
+  
 
   state: CustomizerState = {
     iterations: this.props.initIterations || 1,
+    axiomString: this.props.initAxiom  || "",
+    productionStrings: this.props.initProductions || [""],
     errorMessage: ""
   }
   //Receive state from children, and update LSystem
   updateAxiom = (ax: Axiom, axString: string) => {
     this.axiom = ax;
-    this.axiomString = axString;
+    this.setState({axiomString: axString});
     this.resetLS();
   }
   updateProductions = (productions: Production[], productionStrings: string[]) => {
     this.productions = productions;
-    this.productionStrings = productionStrings;
+    this.setState({productionStrings: productionStrings});
     this.resetLS();
   }
   resetLS = () => {
@@ -60,7 +65,7 @@ export default class LSCustomizer extends React.Component<CustomizerProps, Custo
         //Loading spinner here
         newLS.iterate();
         //End loading spinner when its done....
-        this.props.onLSReset(newLS, this.axiomString as string, this.productionStrings as string[]);
+        this.props.onLSReset(newLS);
         this.LSystem = newLS;
         this.setState({ errorMessage: "" });
 
@@ -114,7 +119,12 @@ export default class LSCustomizer extends React.Component<CustomizerProps, Custo
   render = () => {
     return (
       <div>
+        <div style={{ display: "flex", flexDirection: "row", gap: "12px" }}>
+          {CopyTextButton(this.state.axiomString, this.state.productionStrings)}
+          <PasteOverrideInput/>
+        </div>
         <div>Status: {this.state.errorMessage === "" ? "✅" : "🛑 " + this.state.errorMessage}</div>
+        
         <div> {this.getControls()} </div>
         <div>
           <GFXPropsCustomizer gfxProps={this.props.initGFXProps || {}}
@@ -122,6 +132,48 @@ export default class LSCustomizer extends React.Component<CustomizerProps, Custo
         </div>
       </div>)
   }
+}
+
+// Overrides
+
+class PasteOverrideInput extends React.Component<{ }, { text: string, pasteOpen: boolean }> {
+  state = {
+    text: "",
+    pasteOpen: false
+  }
+  textToLSData = () => {
+    let txt = this.state.text;
+    let txtArray = txt.split("\n");
+    return {axiom: txtArray[0], productions: txtArray.splice(1)}
+  }
+  getTextBox = () => {
+    let data = this.textToLSData();
+    return (<div>
+      <span> <i> Enter the LSystem here, with a new line for each production. Axiom comes first</i></span>
+      <textarea onChange={(e) => { this.setState({ text: e.target.value }) }} value={this.state.text} />
+      <span className="clickable"> <Link to={`/edit${encodeParams(data.axiom, data.productions)}`} > submit </Link> </span>
+    </div >)
+  }
+  render() {
+    return (
+    <div>
+      <span className="clickable" onClick={(e) => this.setState({ pasteOpen: !this.state.pasteOpen })}>
+        override {this.state.pasteOpen ? "-" : "+"}
+      </span>
+      {this.state.pasteOpen && this.getTextBox()}
+    </div>
+    )
+  }
+}
+
+function CopyTextButton(axiomText: string, productionsText: string[]) {
+  return (
+    <div>
+    <CopyToClipboard text={flattenText([axiomText, ...productionsText], "\n")} onCopy={() => alert("Copied!")}>
+      <span className="clickable"> copy </span>
+    </CopyToClipboard>
+  </div>
+  )
 }
 
 //AxiomCustomizer.js

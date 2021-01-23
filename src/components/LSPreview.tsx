@@ -47,5 +47,4 @@ export class LSPreview extends React.Component<LSPreviewProps, LSPreviewState>{
         <P5Turtle LSystem={this.state.currentLS} GFXProps={this.props.gfxprops} />
       </div>)
   }
-
 }

@@ -1,9 +1,6 @@
 import React from "react"
 import p5 from "p5"
-import LSystem, { Axiom, Letter, ParamsValue } from "@bvk/lsystem";
-import { Dw } from "./lib/easyCam";
-import { Console } from "console";
-import { textSpanIntersectsWithTextSpan } from "typescript";
+import LSystem from "@bvk/lsystem";
 import { GFXProps } from "./utils";
 
 
