@@ -60,11 +60,11 @@ function staticExamples() {
   function drawExamples() {
     let examplesDOM: JSX.Element[] = [];
     examples.forEach((example, index) => {
-      let lS = new LSystem(example.axiom, example.productions, example.iterations);
+      //let lS = new LSystem(example.axiom, example.productions, example.iterations);
       let preview = (<LSPreview
-        LSystem={lS}
         axiomText={example.axiom}
         productionsText={example.productions}
+        iterations={example.iterations || 1}
         gfxprops={example.gfxprops}
         key={"eg" + example.name}
       />);

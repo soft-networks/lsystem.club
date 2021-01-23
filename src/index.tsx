@@ -5,11 +5,9 @@ import "./global.css"
 import { BrowserRouter as Router } from "react-router-dom";
 
 ReactDOM.render(
-  <React.StrictMode>
-    <Router>
-      {Home()}
-    </Router>
-  </React.StrictMode>,
+  <Router>
+    {Home()}
+  </Router>,
   document.getElementById('root')
 );
 
