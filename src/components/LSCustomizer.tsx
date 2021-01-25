@@ -59,8 +59,9 @@ export default class LSCustomizer extends React.Component<CustomizerProps, Custo
   }
   resetLS = () => {
     if (this.axiom && this.productions && this.productions.length > 0) {
+      let newLS;
       try {
-        let newLS = new LSystem(this.axiom, this.productions, this.state.iterations);
+        newLS = new LSystem(this.axiom, this.productions, this.state.iterations);
         //TODO: ASYNC AWAIT
         //Loading spinner here
         newLS.iterate();
@@ -70,7 +71,8 @@ export default class LSCustomizer extends React.Component<CustomizerProps, Custo
         this.setState({ errorMessage: "" });
 
       } catch (e) {
-        this.setState({ errorMessage: e.message });
+        console.log(newLS);
+        this.setState({ errorMessage: e.message + " check console for more info" });
       }
     } else {
       this.setState({ errorMessage: "Not recreating LSystem, axiom or productions didn't exist" })
@@ -208,7 +210,8 @@ class AxiomCustomizer extends React.Component<AxiomProps, AxiomState> {
       this.setState({ axiomParses: true, errorMessage: "" });
       this.props.didUpdate(axiomObj, axiomString);
     } catch (e) {
-      this.setState({ axiomParses: false, errorMessage: e.message });
+      
+      this.setState({ axiomParses: false, errorMessage: e.message});
     }
   }
   render() {
@@ -283,6 +286,9 @@ class ProductionsCustomizer extends React.Component<ManyProductionProps, ManyPro
     this.setState({ productionStrDict: productionStrings });
     try {
       let productionObj = parseProduction(productionString);
+      console.log("Parsed, here it is ");
+      console.log(productionObj);
+
       this.productionObjDict[productionKey] = productionObj;
       //console.log(this.productionObjDict);
       this.updateParent();

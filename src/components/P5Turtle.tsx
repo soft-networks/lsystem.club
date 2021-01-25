@@ -3,17 +3,17 @@ import p5 from "p5"
 import LSystem, { ParamsValue } from "@bvk/lsystem";
 import { GFXProps } from "./utils";
 
-
 interface myProps {
   LSystem: LSystem | undefined;
   GFXProps?: GFXProps
 }
 export default class P5Turtle extends React.Component<myProps> {
-  private p5Context: p5 | undefined;
-  private containerRef = React.createRef<HTMLDivElement>();
+  p5Context: p5 | undefined;
+  containerRef = React.createRef<HTMLDivElement>();
+  canvasType : "webgl" | "p2d" = "p2d";
+
   constructor(props: myProps) {
     super(props);
-    this.drawCS = this.drawCS.bind(this);
     this.drawChar = this.drawChar.bind(this);
     this.redraw = this.redraw.bind(this);
   }
@@ -26,7 +26,7 @@ export default class P5Turtle extends React.Component<myProps> {
   }
   sketch = (p: p5) => {
     p.setup = () => {
-      p.createCanvas(this.props.GFXProps?.width || 800, this.props.GFXProps?.height || 800);
+      p.createCanvas(this.props.GFXProps?.width || 800, this.props.GFXProps?.height || 800, this.canvasType);
       p.angleMode(p.DEGREES);
       p.colorMode(p.HSB);
       p.noLoop();
@@ -54,7 +54,7 @@ export default class P5Turtle extends React.Component<myProps> {
       console.log(this.p5Context);
     }
   }
-  drawCS() {
+  drawCS = () => {
     if (this.props.LSystem !== undefined) {
       //Setup drawing
       let cS = this.props.LSystem.getIterationAsObject();
@@ -63,16 +63,19 @@ export default class P5Turtle extends React.Component<myProps> {
       //Setup default values 
       let center = this.props.GFXProps?.center !== undefined ? [p.width * this.props.GFXProps?.center[0], p.height * this.props.GFXProps?.center[1]] : [0, 0];
       let sw = this.props.GFXProps?.strokeWeight ? this.props.GFXProps?.strokeWeight : 1;
-      let defaultLength = this.props.GFXProps?.length ? this.props.GFXProps?.length * p.height : 0.01 * p.height;
+      let defaultLength = this.props.GFXProps?.length ? this.props.GFXProps?.length : 0.01 * p.height;
       let defaultAngle = this.props.GFXProps?.angle ? this.props.GFXProps?.angle : 90;
 
       //Begin drawing
       p.push();
-      p.translate(p.width / 2, p.height / 2);
+      this.moveToCenter()
+      p.translate(center[0], center[1], 0);
+
+      this.rotateToUp();
       p.noFill();
       p.stroke(0, 0, 0);
       p.strokeWeight(sw);
-      p.translate(center[0], center[1], 0);
+      
       let steps = cS.length;
       for (let i = 0; i < steps; i++) {
         let letter = cS[i];
@@ -85,6 +88,14 @@ export default class P5Turtle extends React.Component<myProps> {
       p.pop();
       p.noLoop();
     }
+  }
+  rotateToUp = () => {
+    let p = this.p5Context;
+    if (p) p.rotate(-90);
+  }
+  moveToCenter = () => {
+    let p = this.p5Context;
+    if (p) p.translate(p.width / 2, p.height / 2);
   }
   drawChar(char: string, l: number, a: number, params: ParamsValue | undefined) {
     let p = this.p5Context;
@@ -115,7 +126,10 @@ export default class P5Turtle extends React.Component<myProps> {
       case "!":
         p.strokeWeight(l)
         break;
-      case "@":
+      case "~":
+        p.rotate(Math.random() * a);
+        break;
+      case "#":
         p.stroke(l, 100, 100);
         break;
       // case "T":

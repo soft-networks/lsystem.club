@@ -11,7 +11,7 @@ export interface GFXProps {
 }
 
 export function flattenText(stringarr: string[], delimiter: string) {
-  return stringarr.reduce((str, t) => str + delimiter + t, "")
+  return stringarr.reduce((str, t) => str + t + delimiter, "")
 }
 
 export function decodeParams(paramString: string): {axiom?: string , productions?: string[], gfxProps?: GFXProps} {
