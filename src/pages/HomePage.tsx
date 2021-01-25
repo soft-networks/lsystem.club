@@ -34,7 +34,7 @@ function staticExamples() {
     },
     {
       name: "Spiral",
-      axiom: "A", productions: ["A:FB + A", "B:[-(90)FF]"], iterations: 4,
+      axiom: "A", productions: ["A:FB + A", "B:[-(90)FF]"], iterations:36 ,
       gfxprops: { angle: 5 }
     },
     {
@@ -46,11 +46,25 @@ function staticExamples() {
       axiom: "- [A(5)]", productions: ["A(a): @(a*1.5) FFF I(40) +(rnd(0,10))  A(a+1) E(4)", "I(a): [-(a)B] [+(a)B]", "B:FBE(4)", "B:I(rnd(0,10))"], iterations: 11
     },
     {
+      name: "Fern leaf",
+      axiom: "-A(0,1)",iterations: 13,
+      productions: ["A(d,D){d>0}: A(d-1,D)", "A(d,D){d==0}: F(1)[+(45)A(D,D)][-(45)A(D,D)]F(1)A(0,D)", "F(a): F(a*1.48)"],
+      gfxprops: {length: 2, center: [0,0.4]}
+    },
+    {
       name: "Simple tree",
-      axiom: `-(90)FA(25)`,
-      productions: ["A(x): F[+(x)FA(0.9*x)][-(x)FA(0.9*x)]"], iterations: 5,
-      gfxprops: { angle: 22.5, length: 0.07, center: [0, 0.4] }
+      axiom: `-(90)A(10)`,
+      productions: ["A(x):F[+(x)FA(0.9*x)][-(x)FA(0.9*x)]"],
+      iterations: 5,
+      gfxprops: { angle: 22.5, length: 0.08, center: [0, 0.4] }
     }, {
+      name: "Graphic tree",
+      axiom: "-(90)A(25)",
+      productions: ["A(x):!(1.5)F(4.1)Y(x)[+(x)E(4.1)A(0.9*x)][-(x)E(4.1)A(0.9*x)]", "F(x):@(10) F(x*1.55)", "!(x){x>=1.5}:!(x*1.44)", "E(x):{5} @(rnd(0,300)) F(x)", "E(x):{1} @(250) E(x)", "Y(x): [-(rnd(-45,45)) A(x)]"],
+      iterations: 9, 
+      gfxprops: {center: [0, 0.4]}
+    },
+    {
       name: "Plants with flowers",
       axiom: `-(90)A(8)`,
       productions: ["A(x){x>1}:F[-B][+B]A(x-1)", "A(x){x<=1}: BE", "B: FF"], iterations: 10,

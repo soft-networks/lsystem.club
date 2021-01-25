@@ -7,12 +7,11 @@ body {
   font-family: monospace;
 }
 
-.small {
-  font-size: 0.5rem;
-}
-
-.bold {
-  font-style: italic;
+em {
+  line-height: 200%;
+  font-family: Helvetica;
+  font-style: inherit;
+  font-size: 100%;
 }
 
 .border-bottom {
@@ -32,13 +31,51 @@ body {
 .clickable {
   color: blue;
   cursor: pointer;
+  border: 1px solid #eee;
+  padding: 6px;
+  border-radius: 4px;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  
+}
+.stack > * + *{
+  padding-top: 12px;
+  margin-top: 12px;
+}
+
+.stack.border > * + * {
+  border-top: 1px dotted gray;
+}
+
+.stack.small > * + * { 
+  padding-top: 4px;
+  margin-top: 4px;
+}
+
+.horizontal-stack {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+}
+
+
+
+.horizontal-stack > * {
+  display: inline-flex;
 }
 
 .side-by-side {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
 }
 
+.side-by-side > * {
+  width: 50%;
+  flex-basis: 800px;
+}
 .become-visible {
   animation-name: fadein;
   animation-duration: 0.2s;

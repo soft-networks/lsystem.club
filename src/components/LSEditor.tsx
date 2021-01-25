@@ -3,6 +3,7 @@ import LSystem from "@bvk/lsystem";
 import LSCustomizer from "./LSCustomizer";
 import P5Turtle from "./P5Turtle";
 import { GFXProps } from "./utils";
+import LSViewer from "./LSViewer";
 
 interface LSEditorState {
   LSystem: LSystem | undefined,
@@ -29,7 +30,7 @@ export default class LSEditor extends React.Component<LSEditorProps, LSEditorSta
   }
   render() {
       return (
-      <div>
+      <div className="side-by-side">
           <LSCustomizer
           onLSIterated={this.onLSIterated}
           onLSReset={this.onLSReset}
@@ -40,7 +41,7 @@ export default class LSEditor extends React.Component<LSEditorProps, LSEditorSta
           key="LSCustomizer"
           initIterations={2}
           />
-          <P5Turtle LSystem={this.state.LSystem} GFXProps={this.state.gfxProps} />
+          <LSViewer LSystem={this.state.LSystem} gfxProps={this.state.gfxProps}/>
       </div >
       )
     }

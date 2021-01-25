@@ -1,6 +1,6 @@
 import React from "react"
 import p5 from "p5"
-import LSystem from "@bvk/lsystem";
+import LSystem, { ParamsValue } from "@bvk/lsystem";
 import { GFXProps } from "./utils";
 
 
@@ -30,6 +30,8 @@ export default class P5Turtle extends React.Component<myProps> {
       p.angleMode(p.DEGREES);
       p.colorMode(p.HSB);
       p.noLoop();
+      p.textFont("monospace ", 12);
+      //p.strokeCap(p.SQUARE)
       this.p5Context = p;
       this.redraw();
     };
@@ -75,15 +77,16 @@ export default class P5Turtle extends React.Component<myProps> {
       for (let i = 0; i < steps; i++) {
         let letter = cS[i];
         let char = letter.symbol;
+        let params = letter.params;
         let param = letter.params && letter.params.length == 1 ? letter.params[0] + "" : undefined;
         let val = param && !isNaN(parseFloat(param)) ? parseFloat(param) : undefined
-        this.drawChar(char, val || defaultLength, val || defaultAngle);
+        this.drawChar(char, val || defaultLength, val || defaultAngle, params);
       }
       p.pop();
       p.noLoop();
     }
   }
-  drawChar(char: string, l: number, a: number) {
+  drawChar(char: string, l: number, a: number, params: ParamsValue | undefined) {
     let p = this.p5Context;
     if (!p) return;
     switch (char) {
@@ -115,6 +118,13 @@ export default class P5Turtle extends React.Component<myProps> {
       case "@":
         p.stroke(l, 100, 100);
         break;
+      // case "T":
+      //   let txtvalue = "text";
+      //   if (params) {
+      //     txtvalue = params[Math.floor(Math.random() * params.length)] as string;
+      //   }
+      //   p.text(txtvalue,0,0);
+      //   break;
       default:
       //console.log(char + " isn't turtle command");
     }

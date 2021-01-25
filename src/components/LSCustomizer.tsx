@@ -96,13 +96,11 @@ export default class LSCustomizer extends React.Component<CustomizerProps, Custo
   //Generate UI
   getControls = () => {
     let iterationControl = this.getIterationController();
-    let refreshController = (<span className="clickable" onClick={(e) => this.resetLS()} key="refresh-control"> force refresh </span>);
     let axiomControl = <AxiomCustomizer didUpdate={this.updateAxiom} key={"axiom-controls"} initAxiom={this.props.initAxiom} />
     let productionsControl = <ProductionsCustomizer didUpdate={this.updateProductions} key={"production-controls"} initProductions={this.props.initProductions} />
 
     let controls = [];
     controls.push(iterationControl);
-    controls.push(refreshController);
     controls.push(axiomControl);
     controls.push(productionsControl);
     return <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}> {controls} </div>;
@@ -112,21 +110,28 @@ export default class LSCustomizer extends React.Component<CustomizerProps, Custo
     return (
       <div key="iteration-control">
         <label> Iterations </label>
-        <input type="number" onChange={this.updateIterations} value={this.state.iterations} />
+        <input type="number" onChange={this.updateIterations} value={this.state.iterations} min={0} />
       </div>
     )
   }
   render = () => {
     return (
-      <div>
-        <div style={{ display: "flex", flexDirection: "row", gap: "12px" }}>
-          {CopyTextButton(this.state.axiomString, this.state.productionStrings)}
-          <PasteOverrideInput/>
+      <div className="stack border">
+        <div> 
+          <em> LSystem Editor </em> <br/> 
+          <div>  Status: {this.state.errorMessage === "" ? "✅" : "🛑 " + this.state.errorMessage} </div>
+          <div className="horizontal-stack">
+            <span className="clickable" onClick={(e) => this.resetLS()} key="refresh-control"> force refresh </span>
+            {CopyTextButton(this.state.axiomString, this.state.productionStrings)}
+            <PasteOverrideInput/>
+          </div>
         </div>
-        <div>Status: {this.state.errorMessage === "" ? "✅" : "🛑 " + this.state.errorMessage}</div>
-        
-        <div> {this.getControls()} </div>
+        <div> 
+          <em> LSystem properties </em>
+          {this.getControls()} 
+        </div>
         <div>
+        <em> GFX Properties </em>
           <GFXPropsCustomizer gfxProps={this.props.initGFXProps || {}}
             GFXPropsUpdated={this.props.onGFXPropsUpdate} />
         </div>
@@ -267,8 +272,8 @@ class ProductionsCustomizer extends React.Component<ManyProductionProps, ManyPro
     correctKeys.forEach((key) => {
       productionStrings.push(this.state.productionStrDict[key]);
     })
-    console.log("ProductionCuztomizer sending back to parent");
-    console.log(productions);
+    //console.log("ProductionCuztomizer sending back to parent");
+    //console.log(productions);
     this.props.didUpdate(copiedvalues, productionStrings);
   }
   updateProduction = (productionString: string, productionKey: string) => {
@@ -279,7 +284,7 @@ class ProductionsCustomizer extends React.Component<ManyProductionProps, ManyPro
     try {
       let productionObj = parseProduction(productionString);
       this.productionObjDict[productionKey] = productionObj;
-      console.log(this.productionObjDict);
+      //console.log(this.productionObjDict);
       this.updateParent();
       let errorMessages = this.state.errorMessages;
       delete errorMessages[productionKey];
@@ -313,12 +318,12 @@ class ProductionsCustomizer extends React.Component<ManyProductionProps, ManyPro
     return productionKeys.map((pKey, index) => {
       let pString = this.state.productionStrDict[pKey];
       let productionInput = (
-        <div key={pKey} style={{ display: "flex", flexDirection: "column", gap: "12px" }} >
+        <div key={pKey} className="stack small">
           <div>
             <label> Prod {index}
               <span className="clickable right-button"
                 onClick={(e) => this.removeProduction(pKey)}>
-                (-)
+                -
                 </span>
             </label>
             <input key={pKey + "-input"}
@@ -335,7 +340,7 @@ class ProductionsCustomizer extends React.Component<ManyProductionProps, ManyPro
   render() {
     return (<div>
       {this.getProductions()}
-      <div className="clickable" onClick={this.addProduction}>Add production</div>
+      <span className="clickable" onClick={this.addProduction}>Add production</span>
     </div>)
   }
 }
