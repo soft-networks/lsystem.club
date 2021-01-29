@@ -1,6 +1,6 @@
 import React from "react"
 import p5 from "p5"
-import LSystem, { ParamsValue } from "@bvk/lsystem";
+import LSystem, { Axiom, ParamsValue } from "@bvk/lsystem";
 import { GFXProps } from "./utils";
 
 interface myProps {
@@ -11,6 +11,10 @@ export default class P5Turtle extends React.Component<myProps> {
   p5Context: p5 | undefined;
   containerRef = React.createRef<HTMLDivElement>();
   canvasType : "webgl" | "p2d" = "p2d";
+  iterateAnimationIndex : undefined | number;
+  walkthroughAnimationIndex: undefined | number;
+  currentDrawCommand: Axiom | undefined;
+  
 
   constructor(props: myProps) {
     super(props);
@@ -26,11 +30,12 @@ export default class P5Turtle extends React.Component<myProps> {
   }
   sketch = (p: p5) => {
     p.setup = () => {
-      p.createCanvas(this.props.GFXProps?.width || 800, this.props.GFXProps?.height || 800, this.canvasType);
+      p.createCanvas(this.props.GFXProps?.width || 600, this.props.GFXProps?.height || 600, this.canvasType);
       p.angleMode(p.DEGREES);
       p.colorMode(p.HSB);
       p.noLoop();
       p.textFont("monospace ", 12);
+      p.strokeCap("butt")
       //p.strokeCap(p.SQUARE)
       this.p5Context = p;
       this.redraw();
@@ -46,7 +51,7 @@ export default class P5Turtle extends React.Component<myProps> {
   redraw() {
     if (this.p5Context !== undefined) {
       this.p5Context?.clear();
-      this.p5Context?.background(0, 0, 90);
+      this.p5Context?.background(255, 0, 255);
       this.drawCS();
       this.p5Context?.noLoop();
     } else {
@@ -54,10 +59,33 @@ export default class P5Turtle extends React.Component<myProps> {
       console.log(this.p5Context);
     }
   }
+  animateIterations = () => {
+    if (this.props.LSystem?.iterations === undefined || this.iterateAnimationIndex === undefined) {
+      console.log("Cant animate");
+      return;
+    }
+    if (this.iterateAnimationIndex > this.props.LSystem?.iterations) {
+      console.log("Animation finished");
+      this.iterateAnimationIndex = undefined;
+      return;
+    }
+    
+    let allIterations = this.props.LSystem.getAllIterationsAsObject();
+    let currentIteration = allIterations[this.iterateAnimationIndex];
+    this.currentDrawCommand = currentIteration;
+    this.redraw();
+    this.iterateAnimationIndex++;
+    setTimeout(this.animateIterations, 100);
+  }
+  startIterationAnimation = () => {
+    this.walkthroughAnimationIndex = undefined;
+    this.iterateAnimationIndex = 0;
+    this.animateIterations();
+  }
   drawCS = () => {
     if (this.props.LSystem !== undefined) {
       //Setup drawing
-      let cS = this.props.LSystem.getIterationAsObject();
+      let cS = this.currentDrawCommand || this.props.LSystem.getIterationAsObject();
       let p = this.p5Context as p5;
 
       //Setup default values 
@@ -130,7 +158,8 @@ export default class P5Turtle extends React.Component<myProps> {
         p.rotate(Math.random() * a);
         break;
       case "#":
-        p.stroke(l, 100, 100);
+        if (!l || l==0)  p.stroke(0,0,0);
+        else p.stroke(l, 100, 100);
         break;
       // case "T":
       //   let txtvalue = "text";
@@ -145,7 +174,10 @@ export default class P5Turtle extends React.Component<myProps> {
   }
 
   render() {
-    return <div ref={this.containerRef} style={{ width: this.props.GFXProps?.width || 800, height: this.props.GFXProps?.height || 800, backgroundColor: "white" }} />;
+    return (<div>
+      <span className="clickable" onClick={() => this.startIterationAnimation()}> animate growth </span>
+      <div ref={this.containerRef} />
+    </div>)
   }
 
 }

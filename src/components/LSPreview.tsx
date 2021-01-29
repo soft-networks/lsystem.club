@@ -4,12 +4,16 @@ import { Link } from "react-router-dom";
 import P5Turtle from "./P5Turtle";
 import { encodeParams, flattenText, GFXProps } from "./utils";
 import VizSensor from "react-visibility-sensor";
+import P5Turtle3D from "./P5Turtle3D";
+import { LSText } from "./LSViewer";
 
 interface LSPreviewProps {
   axiomText: string;
   productionsText: string[];
   iterations: number;
   gfxprops?: GFXProps;
+  renderType?: "2d" | "str" | "3d",
+  name?: string
 }
 interface LSPreviewState {
   currentLS: LSystem | undefined;
@@ -49,6 +53,22 @@ export class LSPreview extends React.Component<LSPreviewProps, LSPreviewState> {
     );
     this.setState({ currentLS: ls });
   };
+  getRenderer = () => {
+    if (!this.props.renderType || this.props.renderType == "2d") {
+      return     (<P5Turtle
+        LSystem={this.state.currentLS}
+        GFXProps={this.props.gfxprops}
+        />)
+    } 
+    if (this.props.renderType == "3d") {
+      return (<P5Turtle3D 
+      LSystem={this.state.currentLS}
+      GFXProps={this.props.gfxprops}
+      />)
+    } else {
+      return LSText(this.state.currentLS)
+    }
+  }
   render = () => {
     return (
       <VizSensor onChange={this.createLS} partialVisibility={true}>
@@ -59,7 +79,7 @@ export class LSPreview extends React.Component<LSPreviewProps, LSPreviewState> {
         >
           <div>
             <div>
-              Lystem: <br />
+              Lystem: {this.props.name} <br />
               <ul>
                 <li> {this.props.axiomText} </li>{" "}
                 {this.props.productionsText.map((pT) => (
@@ -94,10 +114,7 @@ export class LSPreview extends React.Component<LSPreviewProps, LSPreviewState> {
               />
             </div>
           </div>
-          <P5Turtle
-            LSystem={this.state.currentLS}
-            GFXProps={this.props.gfxprops}
-          />
+          {this.getRenderer()}
         </div>
       </VizSensor>
     );

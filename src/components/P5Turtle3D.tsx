@@ -1,7 +1,5 @@
-import React from "react"
-import p5 from "p5"
-import LSystem, { ParamsValue } from "@bvk/lsystem";
-import { GFXProps } from "./utils";
+
+import { ParamsValue } from "@bvk/lsystem";
 import P5Turtle from "./P5Turtle";
 
 
@@ -112,7 +110,8 @@ export default class P5Turtle3D extends P5Turtle {
     return (
       <div>
         <span className="clickable" onClick={(e) => {this.moveCamera(); this.redraw()}}> rotate me </span> 
-        <div ref={this.containerRef} style={{ width: this.props.GFXProps?.width || 800, height: this.props.GFXProps?.height || 800, backgroundColor: "white" }} />
+        <span className="clickable" onClick={() => this.startIterationAnimation()}> animate growth </span>
+        <div ref={this.containerRef} />
       </div>
     )
   }
