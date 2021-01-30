@@ -1,18 +1,19 @@
-
 import { ParamsValue } from "@bvk/lsystem";
+import p5 from "p5";
 import P5Turtle from "./P5Turtle";
-
-
 
 export default class P5Turtle3D extends P5Turtle {
   canvasType : "webgl" | "p2d" = "webgl";
-
+  models : p5.Geometry[] = [];
   private cameraPos: number[] | undefined;
   private cameraNum = 0;
 
   rotateToUp = () => {
     let p = this.p5Context;
     if (p) p.rotate(-180);
+  }
+  preload = (p: p5) => {
+    p.loadModel(process.env.PUBLIC_URL + "/assets/lily-flat.obj", true, (m) => {console.log("Success"); console.log(m); this.models.push(m)}, (e) => {console.log(e); console.log("Fail")});
   }
   moveToCenter = () => {
     //Do nothing, were already there
@@ -79,6 +80,19 @@ export default class P5Turtle3D extends P5Turtle {
         break;
       case "#":
         p.stroke(l, 100, 100);
+        break;
+      case "M":
+        //TODO: Generalize this... for now its just staticly drawing a lily flower
+        let model = this.models[0];
+        if (model) {
+          //p.normalMaterial(); 
+          p.specularMaterial(250);
+          //p.scale(10);
+          //let scaleValue = params && params[0] || parseFloat((params as ParamsValue)[0]) || 0.1;
+          p.scale(0.1);
+          console.log("Should be drawing model");
+          p.model(model);
+        }
         break;
       default:
         //console.log(char + " isn't turtle command");

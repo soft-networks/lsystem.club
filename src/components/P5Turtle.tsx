@@ -28,7 +28,11 @@ export default class P5Turtle extends React.Component<myProps> {
   componentDidUpdate() {
     this.redraw();
   }
+  preload = (p :p5) => {
+
+  }
   sketch = (p: p5) => {
+ 
     p.setup = () => {
       p.createCanvas(this.props.GFXProps?.width || 600, this.props.GFXProps?.height || 600, this.canvasType);
       p.angleMode(p.DEGREES);
@@ -37,6 +41,7 @@ export default class P5Turtle extends React.Component<myProps> {
       p.textFont("monospace ", 12);
       p.strokeCap("butt")
       //p.strokeCap(p.SQUARE)
+      this.preload(p);
       this.p5Context = p;
       this.redraw();
     };

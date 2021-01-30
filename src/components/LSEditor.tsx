@@ -2,7 +2,7 @@ import React from "react";
 import LSystem from "@bvk/lsystem";
 import LSCustomizer from "./LSCustomizer";
 import P5Turtle from "./P5Turtle";
-import { GFXProps } from "./utils";
+import { GFXProps, LSProps } from "./utils";
 import LSViewer from "./LSViewer";
 
 interface LSEditorState {
@@ -10,8 +10,7 @@ interface LSEditorState {
   gfxProps?: GFXProps
 }
 interface LSEditorProps {
-  initAxiomString: string,
-  initProductionsString: string[],
+  initLSProps: LSProps
   initGFXProps?: GFXProps
 }
 export default class LSEditor extends React.Component<LSEditorProps, LSEditorState> {
@@ -35,11 +34,9 @@ export default class LSEditor extends React.Component<LSEditorProps, LSEditorSta
           onLSIterated={this.onLSIterated}
           onLSReset={this.onLSReset}
           onGFXPropsUpdate={this.onGFXPropsUpdated}
-          initAxiom={this.props.initAxiomString}
-          initProductions={this.props.initProductionsString}
+          initLSProps={this.props.initLSProps}
           initGFXProps={this.props.initGFXProps}
           key="LSCustomizer"
-          initIterations={2}
           />
           <LSViewer LSystem={this.state.LSystem} gfxProps={this.state.gfxProps}/>
       </div >

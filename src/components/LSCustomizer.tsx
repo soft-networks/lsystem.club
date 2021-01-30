@@ -3,23 +3,19 @@ import LSystem, { Axiom, parseAxiom, parseProduction, Production } from "@bvk/ls
 import React from "react"
 import CopyToClipboard from "react-copy-to-clipboard";
 import { Link } from "react-router-dom";
-import { encodeParams, flattenText, GFXProps } from "./utils";
+import { encodeParams, flattenLSProps, GFXProps, LSProps } from "./utils";
 
 interface CustomizerProps {
   onLSReset(LS: LSystem): void;
   onLSIterated(LS: LSystem): void;
   onGFXPropsUpdate(gfxProps: GFXProps): void;
-  initProductions?: string[],
-  initAxiom?: string,
-  initIterations?: number,
+  initLSProps: LSProps
   initGFXProps?: GFXProps
 }
 
 interface CustomizerState {
-  iterations: number,
   errorMessage: string,
-  axiomString: string,
-  productionStrings: string[]
+  LSData: LSProps
 }
 
 /**
@@ -39,29 +35,30 @@ export default class LSCustomizer extends React.Component<CustomizerProps, Custo
   axiom: Axiom | undefined;
   productions: Production[] | undefined;
   
-
   state: CustomizerState = {
-    iterations: this.props.initIterations || 1,
-    axiomString: this.props.initAxiom  || "",
-    productionStrings: this.props.initProductions || [""],
+    LSData: this.props.initLSProps,
     errorMessage: ""
   }
   //Receive state from children, and update LSystem
   updateAxiom = (ax: Axiom, axString: string) => {
     this.axiom = ax;
-    this.setState({axiomString: axString});
+    let newLSData = this.state.LSData;
+    newLSData.axiom = axString;
+    this.setState({LSData: newLSData});
     this.resetLS();
   }
   updateProductions = (productions: Production[], productionStrings: string[]) => {
     this.productions = productions;
-    this.setState({productionStrings: productionStrings});
+    let newLSData = this.state.LSData;
+    newLSData.productions = productionStrings;
+    this.setState({LSData: newLSData});
     this.resetLS();
   }
   resetLS = () => {
     if (this.axiom && this.productions && this.productions.length > 0) {
       let newLS;
       try {
-        newLS = new LSystem(this.axiom, this.productions, this.state.iterations);
+        newLS = new LSystem(this.axiom, this.productions, this.state.LSData.iterations);
         //TODO: ASYNC AWAIT
         //Loading spinner here
         newLS.iterate();
@@ -80,7 +77,9 @@ export default class LSCustomizer extends React.Component<CustomizerProps, Custo
   }
   updateIterations = (e: React.ChangeEvent<HTMLInputElement>) => {
     let newValue = parseFloat(e.target.value);
-    this.setState({ iterations: newValue });
+    let newLSData = this.state.LSData;
+    newLSData.iterations = newValue;
+    this.setState({LSData: newLSData});
     if (!this.LSystem) {
       this.setState({ errorMessage: "cant iterate an LSystem doesnt exist yet" });
       return;
@@ -98,8 +97,8 @@ export default class LSCustomizer extends React.Component<CustomizerProps, Custo
   //Generate UI
   getControls = () => {
     let iterationControl = this.getIterationController();
-    let axiomControl = <AxiomCustomizer didUpdate={this.updateAxiom} key={"axiom-controls"} initAxiom={this.props.initAxiom} />
-    let productionsControl = <ProductionsCustomizer didUpdate={this.updateProductions} key={"production-controls"} initProductions={this.props.initProductions} />
+    let axiomControl = <AxiomCustomizer didUpdate={this.updateAxiom} key={"axiom-controls"} initAxiom={this.props.initLSProps.axiom} />
+    let productionsControl = <ProductionsCustomizer didUpdate={this.updateProductions} key={"production-controls"} initProductions={this.props.initLSProps.productions} />
 
     let controls = [];
     controls.push(iterationControl);
@@ -112,7 +111,7 @@ export default class LSCustomizer extends React.Component<CustomizerProps, Custo
     return (
       <div key="iteration-control">
         <label> Iterations </label>
-        <input type="number" onChange={this.updateIterations} value={this.state.iterations} min={0} />
+        <input type="number" onChange={this.updateIterations} value={this.state.LSData.iterations} min={0} />
       </div>
     )
   }
@@ -124,7 +123,7 @@ export default class LSCustomizer extends React.Component<CustomizerProps, Custo
           <div>  Status: {this.state.errorMessage === "" ? "✅" : "🛑 " + this.state.errorMessage} </div>
           <div className="horizontal-stack">
             <span className="clickable" onClick={(e) => this.resetLS()} key="refresh-control"> force refresh </span>
-            {CopyTextButton(this.state.axiomString, this.state.productionStrings)}
+            {CopyTextButton(this.state.LSData)}
             <PasteOverrideInput/>
           </div>
         </div>
@@ -158,7 +157,7 @@ class PasteOverrideInput extends React.Component<{ }, { text: string, pasteOpen:
     return (<div>
       <span> <i> Enter the LSystem here, with a new line for each production. Axiom comes first</i></span>
       <textarea onChange={(e) => { this.setState({ text: e.target.value }) }} value={this.state.text} />
-      <span className="clickable"> <Link to={`/edit${encodeParams(data.axiom, data.productions)}`} > submit </Link> </span>
+      <span className="clickable"> <Link to={`/edit${encodeParams(data)}`} > submit </Link> </span>
     </div >)
   }
   render() {
@@ -173,10 +172,10 @@ class PasteOverrideInput extends React.Component<{ }, { text: string, pasteOpen:
   }
 }
 
-function CopyTextButton(axiomText: string, productionsText: string[]) {
+function CopyTextButton(LSData: LSProps) {
   return (
     <div>
-    <CopyToClipboard text={flattenText([axiomText, ...productionsText], "\n")} onCopy={() => alert("Copied!")}>
+    <CopyToClipboard text={flattenLSProps(LSData, "\n")} onCopy={() => alert("Copied!")}>
       <span className="clickable"> copy </span>
     </CopyToClipboard>
   </div>

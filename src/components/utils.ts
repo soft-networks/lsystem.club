@@ -1,44 +1,71 @@
 import queryString from "query-string"
 
+
+
+export const defaultLSData = {
+  axiom: "A",
+  productionText: ["A:FA"],
+  iterations: 2
+}
+
+
+export interface CompleteLSExample {
+  lsProps: LSProps
+  gfxProps?: GFXProps
+  name?: string
+}
+
+export interface LSProps {
+  axiom: string
+  productions: string[]
+  iterations: number
+}
+
+type renderTypes = "2d" | "3d" | "text" | "pixel";
 export interface GFXProps {
-  length?: number;
-  angle?: number;
-  center?: number[];
-  width?: number;
-  height?: number;
-  strokeWeight?: number;
-  threeD?: boolean
+  renderType?: renderTypes[]
+  length?: number
+  angle?: number
+  center?: number[]
+  width?: number
+  height?: number
+  strokeWeight?: number
 }
 
-export function flattenText(stringarr: string[], delimiter: string) {
-  return stringarr.reduce((str, t) => str + t + delimiter, "")
+
+export function flattenLSProps(ls: LSProps, delimiter: string) {
+  let stringArr = [ls.axiom, ...ls.productions];
+  return stringArr.reduce((str, t) => str + t + delimiter, "")
 }
 
-export function decodeParams(paramString: string): {axiom?: string , productions?: string[], gfxProps?: GFXProps} {
-  const parsed = queryString.parse(paramString);
-  let returnDict : {axiom?: string , productions?: string[], gfxProps?: GFXProps}= {};
-  if (parsed.a) returnDict.axiom = parsed.a as string;
-  if (parsed.p) {
-    let productions: string[];
-    if (parsed.p instanceof Array) {
-      productions = parsed.p as Array<string>
-    } else {
-      productions = [parsed.p as string]
-    } 
-    returnDict.productions = productions
+function cleanParam(o: string | string[]): string {
+  if (o instanceof Array) {
+    return o[0] as string
   }
+  else return o as string
+}
+export function decodeParams(paramString: string): {lsProps: LSProps, gfxProps?: GFXProps} {
+  const parsed = queryString.parse(paramString);
+  let axiom = parsed.a ? cleanParam(parsed.a) : defaultLSData.axiom;
+  let iterations = parsed.i ? parseFloat(cleanParam(parsed.i)) : defaultLSData.iterations;
+  let productions = defaultLSData.productionText;
+  if (parsed.p) productions = parsed.p instanceof Array ? parsed.p : [cleanParam(parsed.p)];  
   let gfxProps : GFXProps = {};
   if (parsed.length || parsed.angle) {
-    if (parsed.length) gfxProps.length = parseFloat(parsed.length as string);
-    if (parsed.angle) gfxProps.angle = parseFloat(parsed.angle as string)
-    returnDict.gfxProps = gfxProps;
+    if (parsed.length) gfxProps.length = parseFloat(cleanParam(parsed.length));
+    if (parsed.angle) gfxProps.angle = parseFloat(cleanParam(parsed.angle))
+    if (parsed.c0) gfxProps.center = [parseFloat(cleanParam(parsed.c0)),0];
+    if (parsed.c1) gfxProps.center = [gfxProps.center ? gfxProps.center[0] : 0, parseFloat(cleanParam(parsed.c1))];
   }
-  return returnDict;
+  return {lsProps: {axiom: axiom, iterations: iterations, productions: productions}, gfxProps: gfxProps};
 } 
 
-export function encodeParams(axiom: string | undefined, productions: string[] | undefined, gfxProps?: GFXProps) {
-  let productionString = productions ? productions.reduce((str, p) => str + "&p=" + encodeURIComponent(p), "") : "";
-  let axiomString = axiom ? "a=" + encodeURIComponent(axiom) : "a=";
+export function encodeParams(lsProps: Partial<LSProps>, gfxProps?: GFXProps) {
+  let axiomString = lsProps.axiom ? "a=" + encodeURIComponent(lsProps.axiom) : "a=";
+  let iterationString = lsProps.iterations ? "&i=" + encodeURIComponent(lsProps.iterations) : "";
+  let productionString = lsProps.productions ? lsProps.productions.reduce((str, p) => str + "&p=" + encodeURIComponent(p), "") : "";
+  
+  
   let gfxPropsString = ""; 
   if (gfxProps) {
     if (gfxProps.length) {
@@ -47,7 +74,10 @@ export function encodeParams(axiom: string | undefined, productions: string[] | 
     if (gfxProps.angle) {
       gfxPropsString += "&angle=" + encodeURIComponent(gfxProps.angle);
     }
+    if(gfxProps.center) {
+      gfxPropsString += "&c0=" + encodeURIComponent(gfxProps.center[0]) + "&c1=" + encodeURIComponent(gfxProps.center[1])
+    }
   }
-  let paramString =  "?" + axiomString + productionString + gfxPropsString;
+  let paramString =  "?" + axiomString + productionString + iterationString + gfxPropsString;
   return paramString;
 }

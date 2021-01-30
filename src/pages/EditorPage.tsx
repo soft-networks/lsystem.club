@@ -1,26 +1,22 @@
 import React from "react"
-import { decodeParams, flattenText, GFXProps } from "../components/utils"
+import { decodeParams, GFXProps, LSProps, defaultLSData, flattenLSProps} from "../components/utils"
 import { RouteComponentProps } from "react-router-dom";
 import LSEditor from "../components/LSEditor";
-
-const defaultLSData = {
-  axiom: "A",
-  productionText: ["A:FA"],
-  iterations: 2
-}
 
 interface PathParams {
   LSStr: string
 }
 interface PathState {
-  axiomText: string,
-  productionsText: string[],
+  lsProps: LSProps,
   gfxProps?: GFXProps,
 }
 export default class InteractiveEditor extends React.Component<RouteComponentProps<PathParams>, PathState> {
   state: PathState = {
-    axiomText: defaultLSData.axiom,
-    productionsText: defaultLSData.productionText
+    lsProps: {
+      axiom: defaultLSData.axiom,
+      productions: defaultLSData.productionText,
+      iterations: defaultLSData.iterations
+    }
   }
   componentDidMount= ()=> {
     this.setStateFromURL();
@@ -31,18 +27,16 @@ export default class InteractiveEditor extends React.Component<RouteComponentPro
     }
   }
   setStateFromURL = () => {
-    let { axiom, productions, gfxProps } = decodeParams(this.props.location.search);
+    let { lsProps, gfxProps } = decodeParams(this.props.location.search);
     let newState = this.state;
-    if (axiom) newState.axiomText = axiom;
-    if (productions) newState.productionsText = productions;
+    if (lsProps) newState.lsProps = lsProps;
+    console.log("State from URL");
+    console.log(lsProps);
     if (gfxProps) newState.gfxProps = gfxProps;
     this.setState(newState)
   }
   render() {
-    return <LSEditor initAxiomString={this.state.axiomText} 
-                    initProductionsString={this.state.productionsText} 
-                    initGFXProps={this.state.gfxProps} 
-                    key={flattenText([this.state.axiomText, ...this.state.productionsText], "-")}/>
+    return <LSEditor initLSProps={this.state.lsProps} initGFXProps={this.state.gfxProps} key={flattenLSProps(this.state.lsProps, "-")}/>
   }
 }
 
