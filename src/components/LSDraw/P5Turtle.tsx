@@ -87,6 +87,13 @@ export default class P5Turtle extends React.Component<myProps> {
     this.iterateAnimationIndex = 0;
     this.animateIterations();
   }
+  setDefaults = (p: p5) => {
+    let center = this.props.GFXProps?.center !== undefined ? [p.width * this.props.GFXProps?.center[0], p.height * this.props.GFXProps?.center[1]] : [0, 0];
+    let sw = this.props.GFXProps?.strokeWeight ? this.props.GFXProps?.strokeWeight : 1;
+    let defaultLength = this.props.GFXProps?.length ? this.props.GFXProps?.length : 0.01 * p.height;
+    let defaultAngle = this.props.GFXProps?.angle ? this.props.GFXProps?.angle : 90;
+    return {center, sw, defaultLength, defaultAngle}
+  }
   drawCS = () => {
     if (this.props.LSystem !== undefined) {
       //Setup drawing
@@ -94,10 +101,7 @@ export default class P5Turtle extends React.Component<myProps> {
       let p = this.p5Context as p5;
 
       //Setup default values 
-      let center = this.props.GFXProps?.center !== undefined ? [p.width * this.props.GFXProps?.center[0], p.height * this.props.GFXProps?.center[1]] : [0, 0];
-      let sw = this.props.GFXProps?.strokeWeight ? this.props.GFXProps?.strokeWeight : 1;
-      let defaultLength = this.props.GFXProps?.length ? this.props.GFXProps?.length : 0.01 * p.height;
-      let defaultAngle = this.props.GFXProps?.angle ? this.props.GFXProps?.angle : 90;
+      let {center, sw, defaultLength, defaultAngle} = this.setDefaults(p);
 
       //Begin drawing
       p.push();
