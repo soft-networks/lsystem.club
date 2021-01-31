@@ -1,10 +1,15 @@
 import React from "react";
 import LSystem from "@bvk/lsystem";
 import LSCustomizer from "./LSCustomizer";
-import P5Turtle from "./P5Turtle";
+import P5Turtle from "./LSDraw/P5Turtle";
 import { GFXProps, LSProps } from "./utils";
 import LSViewer from "./LSViewer";
 
+
+/* LSEditor.ts
+* This class is a combination of an LSCustomizer and an LSViewer
+* It manages updates from the customizer, and mantains LS/GFXProps to pass into the viewer.
+* */
 interface LSEditorState {
   LSystem: LSystem | undefined,
   gfxProps?: GFXProps

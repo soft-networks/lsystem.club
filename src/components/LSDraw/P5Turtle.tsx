@@ -1,7 +1,7 @@
 import React from "react"
 import p5 from "p5"
 import LSystem, { Axiom, ParamsValue } from "@bvk/lsystem";
-import { GFXProps } from "./utils";
+import { GFXProps } from "../utils";
 
 interface myProps {
   LSystem: LSystem | undefined;

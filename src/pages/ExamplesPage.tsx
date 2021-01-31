@@ -1,14 +1,10 @@
-import InteractiveEditor from './EditorPage';
-import { Route } from "react-router-dom"
-import LSystem from "@bvk/lsystem";
 import { LSPreview } from "../components/LSPreview";
-import { CompleteLSExample, GFXProps } from "../components/utils"
+import { CompleteLSExample } from "../components/utils"
 
-export default function Home(): JSX.Element {
+export default function Examples(): JSX.Element {
   return (
     <div>
-      <Route path="/edit" component={InteractiveEditor} />
-      <Route exact path="/" render={staticExamples} />
+      {staticExamples()}
     </div>
   )
 }

@@ -1,12 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import  Home  from './pages/HomePage';
+import  Examples  from './pages/ExamplesPage';
 import "./global.css"
-import { BrowserRouter as Router } from "react-router-dom";
+import { BrowserRouter as Router, Route } from "react-router-dom";
+import InteractiveEditor from './pages/EditorPage';
+import Lilac from './components/Examples/Lilac';
 
 ReactDOM.render(
   <Router>
-    {Home()}
+    <Route path="/edit" component={InteractiveEditor} />
+    <Route exact path="/" render={Examples} />
+    <Route exact path="/examples/Lilac" component={Lilac} />
   </Router>,
   document.getElementById('root')
 );

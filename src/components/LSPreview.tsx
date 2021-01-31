@@ -1,10 +1,10 @@
 import LSystem from "@bvk/lsystem";
 import React from "react";
 import { Link } from "react-router-dom";
-import P5Turtle from "./P5Turtle";
+import P5Turtle from "./LSDraw/P5Turtle";
 import { encodeParams, GFXProps, LSProps } from "./utils";
 import VizSensor from "react-visibility-sensor";
-import P5Turtle3D from "./P5Turtle3D";
+import P5Turtle3D from "./LSDraw/P5Turtle3D";
 import { LSText } from "./LSViewer";
 
 interface LSPreviewProps {
@@ -17,6 +17,12 @@ interface LSPreviewState {
   iterations: number;
   hasBeenVisible: boolean;
 }
+
+/* LSViewer.ts
+* This class is a simple class to view an LSystem in one or more renderers.
+* The LSystem cannot be customizer, *but* it can be iterated on. The iterating and updating is all handled here.
+* TODO: We could simplify this as a sub-case of the LSEditor component, but we leave it as is for clarity for now :) 
+* */
 export class LSPreview extends React.Component<LSPreviewProps, LSPreviewState> {
   state: LSPreviewState = {
     currentLS: undefined,
@@ -50,14 +56,21 @@ export class LSPreview extends React.Component<LSPreviewProps, LSPreviewState> {
     );
     this.setState({ currentLS: ls });
   };
-  getRenderer = () => {
-    if (!this.props.gfxProps || !this.props.gfxProps.renderType || this.props.gfxProps.renderType.includes("2d")) {
-      return <P5Turtle LSystem={this.state.currentLS} GFXProps={this.props.gfxProps}/>
-    } else if (this.props.gfxProps.renderType.includes("3d")) {
-      return <P5Turtle3D  LSystem={this.state.currentLS} GFXProps={this.props.gfxProps}/>
-    } else if (this.props.gfxProps.renderType.includes("text")) {
-      return LSText(this.state.currentLS)
+  getRenderers = () => {
+    if (!this.props.gfxProps || !this.props.gfxProps.renderType) {
+      return [<P5Turtle LSystem={this.state.currentLS} GFXProps={this.props.gfxProps}/>]
     }
+    let renderers = [];
+    if(this.props.gfxProps.renderType.includes("2d")) {
+      renderers.push( <P5Turtle LSystem={this.state.currentLS} GFXProps={this.props.gfxProps}/>)
+    } 
+    if (this.props.gfxProps.renderType.includes("3d")) {
+      renderers.push(<P5Turtle3D  LSystem={this.state.currentLS} GFXProps={this.props.gfxProps}/>);
+    }
+    if (this.props.gfxProps.renderType.includes("text")) {
+      renderers.push(LSText(this.state.currentLS));
+    }
+    return renderers;
   }
   render = () => {
     return (
@@ -92,7 +105,9 @@ export class LSPreview extends React.Component<LSPreviewProps, LSPreviewState> {
               />
             </div>
           </div>
-          {this.getRenderer()}
+          <div className="canvas-border">
+            {this.getRenderers()}
+          </div>
         </div>
       </VizSensor>
     );
