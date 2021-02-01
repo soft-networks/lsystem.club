@@ -7,23 +7,23 @@ import { CompleteLSExample, GFXProps } from "../utils"
 const lilacData: CompleteLSExample = {
   name: "lilac",
   lsProps: {
-    axiom: "!(0.9) #(120) [ -(44) ^(20) F(80) AK ] ",
+    axiom: "!(0.9) #(120) [ -(44)  ^(20) F(50) AK ] ",
     productions: [
       "A: P I(0) /(90)  A",
       "I(t) {t!=2}:  F I(t+1)",
       "I(t) {t==2}: ^(rnd(5,15)) #(rnd(60,150)) I(t+1)[-(45)FFA][+(45)FFA][FFA]",
       "P: [-(45)/(45)K][+(45)/(45)K]",
-      "K: [F #(290) !(0.01) F [~ M(0.05)]]",
+      "K: [F #(100) F [~ M(0.05)]]",
       "M(s) {s<0.1}: M(s+0.05)",
       "M(s) {s>=0.1}: M(0.1)"
     ],
-    iterations: 15,
+    iterations: 16,
   },
   gfxProps: {
     length: 3,
     renderType: ["3d"],
     width: 1200,
-    height: 800,
+    height: 850,
     angle: 8
   },
 };
@@ -35,19 +35,22 @@ export default function Lilac() {
   return (
     <div > 
       <DrawLilac LSystem={ls} GFXProps={gfxProps} /> 
+      
     </div>)
 }
 
 const flowerHue = 325;  
 class DrawLilac extends P5Turtle3D {
   windAngle = 0;
+  animationSpeed = 1000;
   preload = (p: p5) => {
     p.loadModel(
       process.env.PUBLIC_URL + "/assets/lily-flat.obj",
       true,
       (m) => {
         this.models.push(m);
-        this.startIterationAnimation()
+        this.redraw()
+        //this.startIterationAnimation()
       },
       (e) => {
         console.log("Fail to load model");
@@ -61,11 +64,12 @@ class DrawLilac extends P5Turtle3D {
     p.background(200, 100,100,0.0);
     
     let pos = [-180,-150,-320];
-    p.ambientLight(flowerHue, 80, 80);
-    p.pointLight(flowerHue, 30, 80,0, -200, -30);
+    p.ambientLight(flowerHue - 95, 80, 100);
+    p.pointLight(flowerHue, 80, 90, -500, -500, -900);
+    p.pointLight(flowerHue + 200, 80, 65, 200, 200, -300);
     
     p.camera(pos[0], pos[1], pos[2], pos[0], pos[1],0, 0,1,0);
-
+    
   }
   simulateWind = () => {
     let maxBlows = Math.floor(Math.random() * 100 + 20);

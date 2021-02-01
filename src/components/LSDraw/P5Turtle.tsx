@@ -14,7 +14,8 @@ export default class P5Turtle extends React.Component<myProps> {
   iterateAnimationIndex : undefined | number;
   walkthroughAnimationIndex: undefined | number;
   currentDrawCommand: Axiom | undefined;
-  
+  animationSpeed: number = 100;
+
 
   constructor(props: myProps) {
     super(props);
@@ -80,7 +81,7 @@ export default class P5Turtle extends React.Component<myProps> {
     this.currentDrawCommand = currentIteration;
     this.redraw();
     this.iterateAnimationIndex++;
-    setTimeout(this.animateIterations, 100);
+    setTimeout(this.animateIterations, this.animationSpeed);
   }
   startIterationAnimation = () => {
     this.walkthroughAnimationIndex = undefined;
