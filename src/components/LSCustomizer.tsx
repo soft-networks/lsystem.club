@@ -104,7 +104,7 @@ export default class LSCustomizer extends React.Component<CustomizerProps, Custo
     controls.push(iterationControl);
     controls.push(axiomControl);
     controls.push(productionsControl);
-    return <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}> {controls} </div>;
+    return controls;
   }
 
   getIterationController = () => {
@@ -117,26 +117,41 @@ export default class LSCustomizer extends React.Component<CustomizerProps, Custo
   }
   render = () => {
     return (
-      <div className="stack border">
-        <div> 
-          <em> LSystem Editor </em> <br/> 
-          <div>  Status: {this.state.errorMessage === "" ? "✅" : "🛑 " + this.state.errorMessage} </div>
+      <div className="stack border sticky">
+        <div>
+          <em> LSystem Editor </em> <br />
+          <div>
+            Status:
+            {this.state.errorMessage === ""
+              ? "✅"
+              : "🛑 " + this.state.errorMessage}{" "}
+          </div>
           <div className="horizontal-stack">
-            <span className="clickable" onClick={(e) => this.resetLS()} key="refresh-control"> force refresh </span>
+            <span
+              className="clickable"
+              onClick={(e) => this.resetLS()}
+              key="refresh-control"
+            >
+              {" "}
+              force refresh{" "}
+            </span>
             {CopyTextButton(this.state.LSData)}
-            <PasteOverrideInput/>
+            <PasteOverrideInput />
           </div>
         </div>
-        <div> 
+        <div className="stack small">
           <em> LSystem properties </em>
-          {this.getControls()} 
+          {this.getControls()}
         </div>
-        <div>
-        <em> GFX Properties </em>
-          <GFXPropsCustomizer gfxProps={this.props.initGFXProps || {}}
-            GFXPropsUpdated={this.props.onGFXPropsUpdate} />
+        <div className="stack small">
+          <em> GFX Properties </em>
+          <GFXPropsCustomizer
+            gfxProps={this.props.initGFXProps || {}}
+            GFXPropsUpdated={this.props.onGFXPropsUpdate}
+          />
         </div>
-      </div>)
+      </div>
+    );
   }
 }
 

@@ -36,7 +36,10 @@ export default class InteractiveEditor extends React.Component<RouteComponentPro
     this.setState(newState)
   }
   render() {
-    return <LSEditor initLSProps={this.state.lsProps} initGFXProps={this.state.gfxProps} key={flattenLSProps(this.state.lsProps, "-")}/>
+    return (
+    <div className="padded">
+      <LSEditor initLSProps={this.state.lsProps} initGFXProps={this.state.gfxProps} key={flattenLSProps(this.state.lsProps, "-")}/>
+    </div>)
   }
 }
 

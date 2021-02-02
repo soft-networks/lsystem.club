@@ -120,9 +120,11 @@ export default class P5Turtle3D extends P5Turtle {
 
   render() {
     return (
-      <div>
-        <span className="clickable" onClick={(e) => {this.moveCamera(); this.redraw()}}> rotate me </span> 
-        <span className="clickable" onClick={() => this.startIterationAnimation()}> animate growth </span>
+      <div className="stack smaller">
+        <div>
+          <span className="clickable" onClick={(e) => {this.moveCamera(); this.redraw()}}> rotate me </span> 
+          <span className="clickable" onClick={() => this.startIterationAnimation()}> animate growth </span>
+        </div>
         <div ref={this.containerRef} />
       </div>
     )

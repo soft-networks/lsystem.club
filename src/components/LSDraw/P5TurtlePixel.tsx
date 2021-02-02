@@ -90,14 +90,4 @@ export default class P5TurtlePixel extends P5Turtle {
       }
     }
 
-
-  render() {
-    return (
-      <div>
-        <span className="clickable" onClick={() => this.startIterationAnimation()}> animate growth </span>
-        <div ref={this.containerRef} />
-      </div>
-    )
-  }
-
 }

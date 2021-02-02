@@ -1,6 +1,6 @@
 import React from "react"
 import p5 from "p5"
-import LSystem, { Axiom, ParamsValue } from "@bvk/lsystem";
+import LSystem, { Axiom, Params, ParamsValue } from "@bvk/lsystem";
 import { GFXProps } from "../utils";
 
 interface myProps {
@@ -15,7 +15,7 @@ export default class P5Turtle extends React.Component<myProps> {
   walkthroughAnimationIndex: undefined | number;
   currentDrawCommand: Axiom | undefined;
   animationSpeed: number = 100;
-
+  customRules: {[key: string]: (p:p5, params: ParamsValue | undefined) => void} = {}
 
   constructor(props: myProps) {
     super(props);
@@ -57,7 +57,7 @@ export default class P5Turtle extends React.Component<myProps> {
   redraw() {
     if (this.p5Context !== undefined) {
       this.p5Context?.clear();
-      this.p5Context?.background(255, 0, 255);
+      this.p5Context?.background(255, 0, 255,0);
       this.drawCS();
       this.p5Context?.noLoop();
     } else {
@@ -171,21 +171,19 @@ export default class P5Turtle extends React.Component<myProps> {
         if (!l || l==0)  p.stroke(0,0,0);
         else p.stroke(l, 100, 100);
         break;
-      // case "T":
-      //   let txtvalue = "text";
-      //   if (params) {
-      //     txtvalue = params[Math.floor(Math.random() * params.length)] as string;
-      //   }
-      //   p.text(txtvalue,0,0);
-      //   break;
       default:
+        if (this.customRules[char]) {
+          this.customRules[char](p,params);
+        }
       //console.log(char + " isn't turtle command");
     }
   }
 
   render() {
-    return (<div>
-      <span className="clickable" onClick={() => this.startIterationAnimation()}> animate growth </span>
+    return (<div className="stack small">
+      <div>
+        <span className="clickable" onClick={() => this.startIterationAnimation()} > animate growth </span>
+      </div>
       <div ref={this.containerRef} />
     </div>)
   }

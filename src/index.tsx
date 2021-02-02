@@ -5,12 +5,14 @@ import "./global.css"
 import { BrowserRouter as Router, Route } from "react-router-dom";
 import InteractiveEditor from './pages/EditorPage';
 import Lilac from './components/Examples/Lilac';
+import textGarden from './components/Examples/TextGarden';
 
 ReactDOM.render(
   <Router>
     <Route path="/edit" component={InteractiveEditor} />
     <Route exact path="/" render={Examples} />
     <Route exact path="/examples/Lilac" component={Lilac} />
+    <Route exact path="/examples/Text" component={textGarden} />
   </Router>,
   document.getElementById('root')
 );

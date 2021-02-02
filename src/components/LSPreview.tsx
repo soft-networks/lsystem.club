@@ -75,19 +75,30 @@ export class LSPreview extends React.Component<LSPreviewProps, LSPreviewState> {
   render = () => {
     return (
       <VizSensor onChange={this.createLS} partialVisibility={true}>
-        <div className={`side-by-side ${this.state.hasBeenVisible === false ? "" : "become-visible"}`}>
-          <div>
+        <div
+          className={`side-by-side ${
+            this.state.hasBeenVisible === false ? "" : "become-visible"
+          }`}
+        >
+          <div className="stack small">
             <div>
-              Lystem: {this.props.name} <br />
+              <em> {this.props.name} </em>
               <ul>
                 <li> {this.props.LSProps.axiom} </li>
-                {this.props.LSProps.productions.map((pT: string) => (<li> {pT}</li>))}
+                {this.props.LSProps.productions.map((pT: string) => (
+                  <li> {pT}</li>
+                ))}
               </ul>
             </div>
             <div>
               <div className="horizontal-stack">
                 <div className="clickable">
-                  <Link to={`/edit${encodeParams(this.props.LSProps, this.props.gfxProps)}`}>
+                  <Link
+                    to={`/edit${encodeParams(
+                      this.props.LSProps,
+                      this.props.gfxProps
+                    )}`}
+                  >
                     edit
                   </Link>
                 </div>
@@ -95,6 +106,8 @@ export class LSPreview extends React.Component<LSPreviewProps, LSPreviewState> {
                   refresh
                 </div>
               </div>
+            </div>
+            <div>
               <label>iterations: {this.state.iterations}</label>
               <input
                 type="number"
@@ -105,9 +118,7 @@ export class LSPreview extends React.Component<LSPreviewProps, LSPreviewState> {
               />
             </div>
           </div>
-          <div className="canvas-border">
-            {this.getRenderers()}
-          </div>
+          <div className="canvas-border">{this.getRenderers()}</div>
         </div>
       </VizSensor>
     );

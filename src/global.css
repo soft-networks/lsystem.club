@@ -16,6 +16,11 @@ em {
   font-size: 100%;
 }
 
+.full-bleed {
+  width: 100vw;
+  height: 100vh;
+}
+
 .canvas-border canvas {
   border: 1px solid black;
 }
@@ -34,6 +39,13 @@ em {
   font-size: 80%;
 }
 
+.padded {
+  padding: 1em;
+}
+
+ul, ol {
+  padding-left: 2em;
+}
 .clickable {
   color: blue;
   cursor: pointer;
@@ -48,8 +60,8 @@ em {
   
 }
 .stack > * + *{
-  padding-top: 12px;
-  margin-top: 12px;
+  padding-top: 1em;
+  margin-top: 1em;
 }
 
 .stack.border > * + * {
@@ -57,17 +69,15 @@ em {
 }
 
 .stack.small > * + * { 
-  padding-top: 4px;
-  margin-top: 4px;
+  padding-top: 0.5em;
+  margin-top: 0.5em;
 }
 
 .horizontal-stack {
   display: flex;
   flex-direction: row;
-  gap: 12px;
+  gap: 0.5em;
 }
-
-
 
 .horizontal-stack > * {
   display: inline-flex;
@@ -76,10 +86,28 @@ em {
 .side-by-side {
   display: flex;
   flex-direction: row;
+  gap: 1em;
 }
 
 .side-by-side > * {
   flex-basis: 600px;
+}
+
+.side-by-side .sticky {
+  position: sticky;
+  top: 0px;
+  left: 0px;
+  align-self: flex-start;
+}
+
+.padded .sticky {
+  top: 1em;
+  left: 1em;
+}
+.floating-button {
+  position: absolute;
+  top: 1em;
+  right: 1em;
 }
 .become-visible {
   animation-name: fadein;
@@ -98,7 +126,7 @@ em {
 input {
   width: 300px;
   height: 40px;
-  padding: 12px;
+  padding: 0.5em;
   outline: none;
   border: none;
   border: 1px solid rgb(240, 240, 250);

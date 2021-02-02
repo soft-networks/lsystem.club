@@ -1,6 +1,5 @@
 import LSystem, { ParamsValue } from "@bvk/lsystem"
 import p5 from "p5"
-import React from "react"
 import P5Turtle3D from "../LSDraw/P5Turtle3D"
 import { CompleteLSExample, GFXProps } from "../utils"
 
@@ -27,7 +26,6 @@ const lilacData: CompleteLSExample = {
     angle: 8
   },
 };
-
 export default function Lilac() {
   let ls =  new LSystem(lilacData.lsProps.axiom, lilacData.lsProps.productions, lilacData.lsProps.iterations);
   let gfxProps = lilacData.gfxProps; 
@@ -49,8 +47,7 @@ class DrawLilac extends P5Turtle3D {
       true,
       (m) => {
         this.models.push(m);
-        this.redraw()
-        //this.startIterationAnimation()
+        this.startIterationAnimation()
       },
       (e) => {
         console.log("Fail to load model");
@@ -97,7 +94,7 @@ class DrawLilac extends P5Turtle3D {
   }
   render() {
     return (
-      <div style={{backgroundImage: "linear-gradient(white 30%, rgb(255,220,250))"}} >
+      <div style={{backgroundImage: "linear-gradient(white 30%, rgb(255,220,250))"}}>
         <div
           style={{
             position: "fixed",

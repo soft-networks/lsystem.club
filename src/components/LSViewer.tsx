@@ -18,10 +18,10 @@ export default class LSViewer extends React.Component<myProps>{
   
   render() {
     return (
-      <div className="canvas-border"> 
-        <P5Turtle3D key="gfx-3d-viewer" LSystem={this.props.LSystem} GFXProps={this.props.gfxProps}/>
-        <P5TurtlePixel key="gfx-pixel-view" LSystem={this.props.LSystem} GFXProps={this.props.gfxProps}/>
+      <div className="canvas-border stack border"> 
         <P5Turtle key="gfx-viewer" LSystem={this.props.LSystem} GFXProps={this.props.gfxProps} />        
+        <P5Turtle3D key="gfx-3d-viewer" LSystem={this.props.LSystem} GFXProps={this.props.gfxProps}/>
+        {/* <P5TurtlePixel key="gfx-pixel-view" LSystem={this.props.LSystem} GFXProps={this.props.gfxProps}/> */}
         <div key="text-viewer"> {LSText(this.props.LSystem)} </div>
       </div>
     )

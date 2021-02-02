@@ -3,7 +3,7 @@ import { CompleteLSExample } from "../components/utils"
 
 export default function Examples(): JSX.Element {
   return (
-    <div>
+    <div className="padded">
       {staticExamples()}
     </div>
   )
@@ -47,11 +47,11 @@ function staticExamples() {
     {
       name: "wildflowers",
       lsProps: {
-          axiom: "P P P P", 
+          axiom: "P P", 
           productions: ["P: +(90) f(100) -(90) [A(rnd(0,10))]", "A(a): FFF I(40) +(rnd(0-a,a))  A(a+1) [ #(200) E(4)]", "I(a): [-(a)B] [+(a)B]", "B:FB [ #(100)E(2)]", "B:I(rnd(0,10))"], 
           iterations: 25
       },
-      gfxProps: {center: [-0.4,0.4]}
+      gfxProps: {center: [-0.2,0.4]}
     },{
       name: "prospect lawn",
       lsProps: {
