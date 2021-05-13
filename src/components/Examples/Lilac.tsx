@@ -40,7 +40,7 @@ export default function Lilac() {
 const flowerHue = 325;  
 class DrawLilac extends P5Turtle3D {
   windAngle = 0;
-  animationSpeed = 1000;
+  animationSpeed = 600;
   preload = (p: p5) => {
     p.loadModel(
       process.env.PUBLIC_URL + "/assets/lily-flat.obj",

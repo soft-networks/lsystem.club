@@ -1,9 +1,18 @@
 import { LSPreview } from "../components/LSPreview";
 import { CompleteLSExample } from "../components/utils"
+import Worker from "../components/worker/index"
 
 export default function Examples(): JSX.Element {
+
+  let doThing = async () => {
+    console.log("Clicked");
+    const instance = new Worker();
+    await instance.processData('Whatever').then((output) => {
+      console.log(output);
+    });
+  }
   return (
-    <div className="padded">
+    <div className="padded" onClick={() => doThing()}>
       {staticExamples()}
     </div>
   )
@@ -17,18 +26,18 @@ function staticExamples() {
   const examples: CompleteLSExample[] = [
     {
       name: "Text example",
-      lsProps: {axiom: "A", productions: ["A:AB", "B:A"], iterations: 9},
+      lsProps: {axiom: "F", productions: ["F:BF", "B:F"], iterations: 9},
       gfxProps: {renderType: ["text"]}
-    },
-    {
-      name: "Koch Curve",
-      lsProps: {axiom: "+(90) [F]", productions: [" F:F+F--F+F"], iterations: 5},
-      gfxProps: { angle: 60, length: 2, center: [-0.4, -0.1] }
     },
     {
       name: "Spiral",
       lsProps: {axiom: "A", productions: ["A:FB + A", "B:[-(90)FF]"], iterations: 72 },
       gfxProps: { angle: 5, center: [-0.1,0]}
+    },
+    {
+      name: "Koch Curve",
+      lsProps: {axiom: "+(90) [F]", productions: [" F:F+F--F+F"], iterations: 5},
+      gfxProps: { angle: 60, length: 2, center: [-0.4, -0.1] }
     },
     {
       name: "Beautiful octopus",
@@ -43,16 +52,7 @@ function staticExamples() {
       },
       gfxProps: { angle: 22.5, length: 25, center: [0, 0.4] }
     },  
-   
     {
-      name: "wildflowers",
-      lsProps: {
-          axiom: "P P", 
-          productions: ["P: +(90) f(100) -(90) [A(rnd(0,10))]", "A(a): FFF I(40) +(rnd(0-a,a))  A(a+1) [ #(200) E(4)]", "I(a): [-(a)B] [+(a)B]", "B:FB [ #(100)E(2)]", "B:I(rnd(0,10))"], 
-          iterations: 25
-      },
-      gfxProps: {center: [-0.2,0.4]}
-    },{
       name: "prospect lawn",
       lsProps: {
         axiom: "A(25)",
@@ -61,7 +61,15 @@ function staticExamples() {
       },
       gfxProps: {center: [0, 0.48], length: 1}
     },
-
+    {
+      name: "wildflowers",
+      lsProps: {
+          axiom: "P", 
+          productions: ["P: +(90) f(100) -(90) [A(rnd(0,10))]", "A(a): FFF I(40) +(rnd(0-a,a))  A(a+1) [ #(200) E(4)]", "I(a): [-(a)B] [+(a)B]", "B:FB [ #(100)E(2)]", "B:I(rnd(0,10))"], 
+          iterations: 25
+      },
+      gfxProps: {center: [-0.2,0.4]}
+    },
     {
       name: "double cymes",
       lsProps: {
@@ -89,7 +97,7 @@ function staticExamples() {
       let preview = (<LSPreview LSProps={example.lsProps} gfxProps={example.gfxProps} key={"eg-" + example.name} name={example.name} />);
       examplesDOM.push(preview);
     });
-    return (<div className="stack border"> {examplesDOM} </div>)
+    return (<div className="stack border large"> {examplesDOM} </div>)
   }
   return drawExamples()
 }

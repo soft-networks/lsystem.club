@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Route } from "react-router-dom";
 import InteractiveEditor from './pages/EditorPage';
 import Lilac from './components/Examples/Lilac';
 import textGarden from './components/Examples/TextGarden';
+import WebPage from './components/Examples/Webpage';
 
 ReactDOM.render(
   <Router>
@@ -13,6 +14,7 @@ ReactDOM.render(
     <Route exact path="/" render={Examples} />
     <Route exact path="/examples/Lilac" component={Lilac} />
     <Route exact path="/examples/Text" component={textGarden} />
+    <Route exact path="/examples/WWW" component={WebPage} />
   </Router>,
   document.getElementById('root')
 );

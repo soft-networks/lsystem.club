@@ -73,6 +73,11 @@ ul, ol {
   margin-top: 0.5em;
 }
 
+.stack.large > * + * {
+  padding-top: 5em;
+  margin-top: 5em;
+}
+
 .horizontal-stack {
   display: flex;
   flex-direction: row;

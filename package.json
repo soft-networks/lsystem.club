@@ -50,6 +50,7 @@
   "devDependencies": {
     "@types/query-string": "^6.3.0",
     "@types/react-copy-to-clipboard": "^5.0.0",
-    "@types/react-router-dom": "^5.1.7"
+    "@types/react-router-dom": "^5.1.7",
+    "comlink-loader": "^2.0.0"
   }
 }

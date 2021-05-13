@@ -369,7 +369,7 @@ class ProductionsCustomizer extends React.Component<ManyProductionProps, ManyPro
 class GFXPropsCustomizer extends React.Component<{ gfxProps: GFXProps, GFXPropsUpdated(gfxProps: GFXProps): void }, GFXProps> {
   state: GFXProps = {
     length: this.props.gfxProps.length || 10,
-    angle: this.props.gfxProps.angle || 10,
+    angle: this.props.gfxProps.angle || 10
   }
   updateAngle = (e: React.ChangeEvent<HTMLInputElement>) => {
     let newAngle = parseFloat(e.target.value);
