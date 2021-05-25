@@ -7,7 +7,10 @@ interface myProps {
   LSystem: LSystem | undefined;
   GFXProps?: GFXProps
 }
-export default class P5Turtle extends React.Component<myProps> {
+interface myState {
+  centerPoints: number[]
+}
+export default class P5Turtle extends React.Component<myProps, myState> {
   p5Context: p5 | undefined;
   containerRef = React.createRef<HTMLDivElement>();
   canvasType : "webgl" | "p2d" = "p2d";
@@ -21,13 +24,16 @@ export default class P5Turtle extends React.Component<myProps> {
     super(props);
     this.drawChar = this.drawChar.bind(this);
     this.redraw = this.redraw.bind(this);
+    this.state = {
+      centerPoints: this.props.GFXProps?.center ? this.props.GFXProps?.center : [0,0]
+    }
   }
   componentDidMount() {
     if (this.containerRef.current)
       new p5(this.sketch, this.containerRef.current);
   }
   componentDidUpdate() {
-    this.redraw();
+    this.startIterationAnimation()
   }
   preload = (p :p5) => {
 
@@ -89,7 +95,8 @@ export default class P5Turtle extends React.Component<myProps> {
     this.animateIterations();
   }
   setDefaults = (p: p5) => {
-    let center = this.props.GFXProps?.center !== undefined ? [p.width * this.props.GFXProps?.center[0], p.height * this.props.GFXProps?.center[1]] : [0, 0];
+    //let center = this.props.GFXProps?.center !== undefined ? [p.width * this.props.GFXProps?.center[0], p.height * this.props.GFXProps?.center[1]] : [0, 0];
+    let center = [this.state.centerPoints[0] * p.width, this.state.centerPoints[1] * p.height];
     let sw = this.props.GFXProps?.strokeWeight ? this.props.GFXProps?.strokeWeight : 1;
     let defaultLength = this.props.GFXProps?.length ? this.props.GFXProps?.length : 0.01 * p.height;
     let defaultAngle = this.props.GFXProps?.angle ? this.props.GFXProps?.angle : 90;
@@ -179,10 +186,22 @@ export default class P5Turtle extends React.Component<myProps> {
     }
   }
 
+  moveCenterPoints = (xD: number,yD: number) => {
+    const amount = 0.1;
+    let x = xD * amount;
+    let y = yD * amount;
+    let newCenterPoints = [this.state.centerPoints[0] + x, this.state.centerPoints[1] + y];
+    this.setState({centerPoints: newCenterPoints});
+  }
+
   render() {
     return (<div className="stack small">
       <div>
         <span className="clickable" onClick={() => this.startIterationAnimation()} > animate growth </span>
+        <span  className="clickable" onClick={() => this.moveCenterPoints(-1,0)}> ← </span>
+        <span  className="clickable" onClick={() => this.moveCenterPoints(1,0)}> ➝ </span>
+        <span  className="clickable" onClick={() => this.moveCenterPoints(0,-1)}> ↑ </span>
+        <span  className="clickable" onClick={() => this.moveCenterPoints(0,1)}> ↓ </span>
       </div>
       <div ref={this.containerRef} />
     </div>)

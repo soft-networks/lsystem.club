@@ -20,7 +20,7 @@ export default class LSViewer extends React.Component<myProps>{
     return (
       <div className="canvas-border stack border"> 
         <P5Turtle key="gfx-viewer" LSystem={this.props.LSystem} GFXProps={this.props.gfxProps} />        
-        <P5Turtle3D key="gfx-3d-viewer" LSystem={this.props.LSystem} GFXProps={this.props.gfxProps}/>
+        {/* <P5Turtle3D key="gfx-3d-viewer" LSystem={this.props.LSystem} GFXProps={this.props.gfxProps}/> */}
         {/* <P5TurtlePixel key="gfx-pixel-view" LSystem={this.props.LSystem} GFXProps={this.props.gfxProps}/> */}
         <div key="text-viewer"> {LSText(this.props.LSystem)} </div>
       </div>
@@ -34,5 +34,5 @@ export function LSText(LSystem: LSystem | undefined) {
   let textDivs = text.map((val, index) => (
     <li>  {val}  </li>
   ));
-  return <ol style={{width: "100%"}}> {textDivs} </ol>
+  return <ol style={{width: "100%", maxWidth: "45vw"}}> {textDivs} </ol>
 }
