@@ -5,7 +5,7 @@ import queryString from "query-string"
 export const defaultLSData = {
   axiom: "A",
   productionText: ["A:FA"],
-  iterations: 2
+  iterations: 10
 }
 
 

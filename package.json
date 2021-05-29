@@ -12,11 +12,13 @@
     "@types/p5": "^0.9.1",
     "@types/react": "^16.14.2",
     "@types/react-dom": "^16.9.10",
+    "ccapture.js": "^1.1.0",
     "p5": "^1.1.9",
     "query-string": "^6.13.8",
     "react": "^17.0.1",
     "react-copy-to-clipboard": "^5.0.3",
     "react-dom": "^17.0.1",
+    "react-resizable": "^3.0.1",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.1",
     "react-visibility-sensor": "^5.1.1",
@@ -25,7 +27,8 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "react-scripts build && echo '/* /index.html 200' > build/_redirects",
+    "deploy": "npm run build && netlify deploy --dir=build --prod",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -48,8 +51,10 @@
     ]
   },
   "devDependencies": {
+    "@types/dom-mediacapture-record": "^1.0.7",
     "@types/query-string": "^6.3.0",
     "@types/react-copy-to-clipboard": "^5.0.0",
+    "@types/react-resizable": "^1.7.2",
     "@types/react-router-dom": "^5.1.7",
     "comlink-loader": "^2.0.0"
   }

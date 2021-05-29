@@ -1,6 +1,5 @@
 import LSystem from "@bvk/lsystem";
 import React from "react"
-import { findAllInRenderedTree } from "react-dom/test-utils";
 import P5Turtle from "./LSDraw/P5Turtle";
 import P5Turtle3D from "./LSDraw/P5Turtle3D";
 import P5TurtlePixel from "./LSDraw/P5TurtlePixel";
@@ -22,7 +21,7 @@ export default class LSViewer extends React.Component<myProps>{
         <P5Turtle key="gfx-viewer" LSystem={this.props.LSystem} GFXProps={this.props.gfxProps} />        
         {/* <P5Turtle3D key="gfx-3d-viewer" LSystem={this.props.LSystem} GFXProps={this.props.gfxProps}/> */}
         {/* <P5TurtlePixel key="gfx-pixel-view" LSystem={this.props.LSystem} GFXProps={this.props.gfxProps}/> */}
-        <div key="text-viewer"> {LSText(this.props.LSystem)} </div>
+        <div key="text-viewer" className="black-border" style={{width: "600px", height: "600px"}} > {LSText(this.props.LSystem)} </div>
       </div>
     )
   }
@@ -34,5 +33,5 @@ export function LSText(LSystem: LSystem | undefined) {
   let textDivs = text.map((val, index) => (
     <li>  {val}  </li>
   ));
-  return <ol style={{width: "100%", maxWidth: "45vw"}}> {textDivs} </ol>
+  return <ol style={{width: "100%", height: "100%", overflow: "scroll"}}> {textDivs} </ol>
 }
