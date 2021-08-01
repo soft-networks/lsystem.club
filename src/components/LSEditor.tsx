@@ -1,9 +1,8 @@
 import React from "react";
 import LSystem from "@bvk/lsystem";
 import LSCustomizer from "./LSCustomizer";
-import P5Turtle from "./LSDraw/P5Turtle";
 import { GFXProps, LSProps } from "./utils";
-import LSViewer from "./LSViewer";
+import LSAllViewer from "./LSViewer";
 
 
 /* LSEditor.ts
@@ -43,7 +42,7 @@ export default class LSEditor extends React.Component<LSEditorProps, LSEditorSta
           initGFXProps={this.props.initGFXProps}
           key="LSCustomizer"
           />
-          <LSViewer LSystem={this.state.LSystem} gfxProps={this.state.gfxProps}/>
+          <LSAllViewer LSystem={this.state.LSystem} gfxProps={this.state.gfxProps}/>
       </div >
       )
     }

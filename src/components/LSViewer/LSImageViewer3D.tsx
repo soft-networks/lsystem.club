@@ -1,12 +1,16 @@
 import { ParamsValue } from "@bvk/lsystem";
 import p5 from "p5";
-import P5Turtle from "./P5Turtle";
+import LSImageViewer2D from "./LSImageViewer2D";
+import '../../styles/resizable.css'
+import {Resizable} from "react-resizable";
 
-export default class P5Turtle3D extends P5Turtle {
+export default class LSImageViewer3D extends LSImageViewer2D {
   canvasType : "webgl" | "p2d" = "webgl";
   models : p5.Geometry[] = [];
   private cameraPos: number[] | undefined;
   private cameraNum = 0;
+  canvasID = "CANVAS-P53D"
+
 
   rotateToUp = () => {
     let p = this.p5Context;
@@ -19,7 +23,7 @@ export default class P5Turtle3D extends P5Turtle {
     //Do nothing, were already there
     let p = this.p5Context;
     if (!p) return;
-    if (!this.cameraPos)  this.cameraPos = [0, 0, p.height/2];
+    if (!this.cameraPos)  {this.cameraPos = [0, 0, 0]; this.moveCamera(); }
     p.camera(this.cameraPos[0], this.cameraPos[1], this.cameraPos[2], 0, 0, 0, 0, 1, 0);
   }
   drawChar = (char: string, l: number, a: number, params: ParamsValue | undefined) => {
@@ -100,7 +104,7 @@ export default class P5Turtle3D extends P5Turtle {
   }
   moveCamera = () => {
     if (!this.p5Context) return;
-    let displacement = this.p5Context.height / 2;
+    let displacement = this.p5Context.height * 0.9;
     if (this.cameraNum == 0) {
       this.cameraPos = [0, 0, displacement];
     }
@@ -124,8 +128,15 @@ export default class P5Turtle3D extends P5Turtle {
         <div>
           <span className="clickable" onClick={(e) => {this.moveCamera(); this.redraw()}}> rotate me </span> 
           <span className="clickable" onClick={() => this.startIterationAnimation()}> animate growth </span>
+          <span className="clickable" onClick={() => this.toggleRecording()}> {this.state.isRecording ? "🔴 Stop recording" : "Start recording" } </span>
+          <span  className="clickable" onClick={() => this.moveCenterPoints(-1,0)}> ← </span>
+          <span  className="clickable" onClick={() => this.moveCenterPoints(1,0)}> ➝ </span>
+          <span  className="clickable" onClick={() => this.moveCenterPoints(0,-1)}> ↑ </span>
+          <span  className="clickable" onClick={() => this.moveCenterPoints(0,1)}> ↓ </span>
         </div>
-        <div ref={this.containerRef} />
+        <Resizable width={this.state.canvasSize[0]} height={this.state.canvasSize[1]} onResize={this.onResize} >
+          <div ref={this.containerRef} />
+        </Resizable>
       </div>
     )
   }

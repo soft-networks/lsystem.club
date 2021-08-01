@@ -1,11 +1,10 @@
 import LSystem from "@bvk/lsystem";
 import React from "react";
 import { Link } from "react-router-dom";
-import P5Turtle from "./LSDraw/P5Turtle";
 import { encodeParams, GFXProps, LSProps } from "./utils";
 import VizSensor from "react-visibility-sensor";
-import P5Turtle3D from "./LSDraw/P5Turtle3D";
-import { LSText } from "./LSViewer";
+import { createLSInWorker } from "./worker";
+import {LSImageViewer2D, LSImageViewer3D, LSTextViewer} from "./LSViewer";
 
 interface LSPreviewProps {
   LSProps: LSProps;
@@ -33,6 +32,7 @@ export class LSPreview extends React.Component<LSPreviewProps, LSPreviewState> {
     let newNum = parseFloat(e.target.value);
     if (this.state.currentLS) {
       this.state.currentLS.setIterations(newNum);
+      //TODO: Move to worker :)
       this.setState({ currentLS: this.state.currentLS, iterations: newNum });
     } else {
       this.setState({ iterations: newNum });
@@ -40,12 +40,11 @@ export class LSPreview extends React.Component<LSPreviewProps, LSPreviewState> {
   };
   createLS = (isVisible: boolean) => {
     if (isVisible && this.state.currentLS === undefined) {
-      let ls = new LSystem(
-        this.props.LSProps.axiom,
-        this.props.LSProps.productions,
-        this.props.LSProps.iterations
-      );
-      this.setState({ currentLS: ls, hasBeenVisible: true });
+      console.log("Starting LS creating...")
+      createLSInWorker(this.props.LSProps).then((ls) => {
+        this.setState({ currentLS: ls, hasBeenVisible: true });
+        console.log("LS Creating stopped", ls);  
+      });
     }
   };
   refreshLS = () => {
@@ -58,17 +57,17 @@ export class LSPreview extends React.Component<LSPreviewProps, LSPreviewState> {
   };
   getRenderers = () => {
     if (!this.props.gfxProps || !this.props.gfxProps.renderType) {
-      return [<P5Turtle LSystem={this.state.currentLS} GFXProps={this.props.gfxProps}/>]
+      return [<LSImageViewer2D LSystem={this.state.currentLS} GFXProps={this.props.gfxProps}/>]
     }
     let renderers = [];
     if(this.props.gfxProps.renderType.includes("2d")) {
-      renderers.push( <P5Turtle LSystem={this.state.currentLS} GFXProps={this.props.gfxProps}/>)
+      renderers.push( <LSImageViewer2D LSystem={this.state.currentLS} GFXProps={this.props.gfxProps}/>)
     } 
     if (this.props.gfxProps.renderType.includes("3d")) {
-      renderers.push(<P5Turtle3D  LSystem={this.state.currentLS} GFXProps={this.props.gfxProps}/>);
+      renderers.push(<LSImageViewer3D  LSystem={this.state.currentLS} GFXProps={this.props.gfxProps}/>);
     }
     if (this.props.gfxProps.renderType.includes("text")) {
-      renderers.push(LSText(this.state.currentLS));
+      renderers.push(LSTextViewer(this.state.currentLS));
     }
     return renderers;
   }

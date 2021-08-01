@@ -4,9 +4,9 @@ import  Examples  from './pages/ExamplesPage';
 import "./global.css"
 import { BrowserRouter as Router, Route } from "react-router-dom";
 import InteractiveEditor from './pages/EditorPage';
-import Lilac from './components/Examples/Lilac';
-import textGarden from './components/Examples/TextGarden';
-import WebPage from './components/Examples/Webpage';
+import Lilac from './pages/Examples/Lilac';
+import textGarden from './pages/Examples/TextGarden';
+import WebPage from './pages/Examples/Webpage';
 
 ReactDOM.render(
   <Router>

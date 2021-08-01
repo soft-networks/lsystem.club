@@ -4,6 +4,7 @@ import LSystem, { Axiom, Params, ParamsValue } from "@bvk/lsystem";
 import { GFXProps } from "../utils";
 import {Resizable, ResizeCallbackData} from "react-resizable";
 import '../../styles/resizable.css'
+
 interface myProps {
   LSystem: LSystem | undefined;
   drawFrame?: boolean
@@ -11,24 +12,26 @@ interface myProps {
 }
 interface myState {
   centerPoints: number[],
-  recordAnimations: boolean,
-  canvasSize: number[]
+  isRecording: boolean,
+  canvasSize: number[],
+  animationTimeoutSpeed: number,
 }
 
 interface CanvasElement extends HTMLCanvasElement {
   captureStream(frameRate?: number): MediaStream;
 }
 
-export default class P5Turtle extends React.Component<myProps, myState> {
+export default class LSImageViewer2D extends React.Component<myProps, myState> {
   p5Context: p5 | undefined;
   containerRef = React.createRef<HTMLDivElement>();
   canvasType : "webgl" | "p2d" = "p2d";
   iterateAnimationIndex : undefined | number;
   walkthroughAnimationIndex: undefined | number;
   currentDrawCommand: Axiom | undefined;
-  animationTimeoutSpeed: number = 500;
-  customRules: {[key: string]: (p:p5, params: ParamsValue | undefined) => void} = {}
+  customRules: {[key: string]: (p:p5, params: ParamsValue | undefined) => void} = {};
   mediaRecorder: MediaRecorder | undefined;
+  recordedChunks: BlobPart[] = [];
+  canvasID = "CANVAS-P52d"
 
   constructor(props: myProps) {
     super(props);
@@ -37,15 +40,21 @@ export default class P5Turtle extends React.Component<myProps, myState> {
     this.state = {
       centerPoints: this.props.GFXProps?.center ? this.props.GFXProps?.center : [0,0],
       canvasSize: [this.props.GFXProps?.width || 600, this.props.GFXProps?.height || 600],
-      recordAnimations : false
+      animationTimeoutSpeed: 500,
+      isRecording : false
     }
+
   }
   componentDidMount() {
     if (this.containerRef.current)
       new p5(this.sketch, this.containerRef.current);
   }
-  componentDidUpdate() {
+  componentDidUpdate(prevProps: myProps, prevState: myState) {
+    if ( prevState.isRecording !== this.state.isRecording) {
+      return; // ignore recording updates
+    }
     this.iterateAnimationIndex = this.props.LSystem?.iterations;
+    this.currentDrawCommand = this.props.LSystem?.getIterationAsObject();
     this.redraw();
   }
   preload = (p :p5) => {
@@ -54,7 +63,8 @@ export default class P5Turtle extends React.Component<myProps, myState> {
   sketch = (p: p5) => {
  
     p.setup = () => {
-      p.createCanvas(this.state.canvasSize[0], this.state.canvasSize[1], this.canvasType);
+      let cnv = p.createCanvas(this.state.canvasSize[0], this.state.canvasSize[1], this.canvasType);
+      cnv.id(this.canvasID);
       p.angleMode(p.DEGREES);
       p.colorMode(p.HSB);
       p.noLoop();
@@ -89,12 +99,9 @@ export default class P5Turtle extends React.Component<myProps, myState> {
       console.log("Cant animate");
       return;
     }
-    if (this.iterateAnimationIndex > this.props.LSystem?.iterations) {
+    if (this.iterateAnimationIndex > this.props.LSystem?.iterations && !this.state.isRecording) {
       console.log("Animation finished");
       this.iterateAnimationIndex = undefined;
-      if (this.mediaRecorder && this.mediaRecorder.state === "recording"){
-       this.mediaRecorder.stop();
-      }
       return;
     }
     
@@ -103,30 +110,52 @@ export default class P5Turtle extends React.Component<myProps, myState> {
     this.currentDrawCommand = currentIteration;
     this.redraw();
     this.iterateAnimationIndex++;
-    setTimeout(this.animateIterations, this.animationTimeoutSpeed);
+    setTimeout(this.animateIterations, this.state.animationTimeoutSpeed);
   }
   startIterationAnimation = () => {
-   
-    let recordingCanvas = document.getElementsByTagName("canvas")[0] as CanvasElement;
+    this.walkthroughAnimationIndex = undefined;
+    this.iterateAnimationIndex = 0;
+    this.animateIterations();
+  }
+  toggleRecording = () => {
+    if (this.state.isRecording) {
+      this.stopRecording();
+    } else {
+      this.startRecording();
+    }
+  }
+  startRecording = () => {
+    if (this.mediaRecorder && this.mediaRecorder.state === "recording") {
+      return; //Already recording
+    }
+    let recordingCanvas = document.getElementById(this.canvasID) as CanvasElement;
     if (recordingCanvas) {
-      if (this.state.recordAnimations) {
         let mediaStream = recordingCanvas.captureStream();
         console.log(mediaStream);
         let options = { mimeType: "video/webm; codecs=vp9" };
         this.mediaRecorder = new MediaRecorder(mediaStream, options);
-        this.mediaRecorder.ondataavailable = handleDataAvailable;
-
+        this.mediaRecorder.ondataavailable = (e: BlobEvent) => {
+          console.log("Data updated");
+          if (e.data.size > 0) {
+            this.recordedChunks.push(e.data);
+            download([...this.recordedChunks]);
+            this.recordedChunks = [];
+          } else {
+            console.log("Empty!");
+          }
+        };
         this.mediaRecorder.start();
-      } else {
-        if (this.mediaRecorder && this.mediaRecorder.state === "recording") {
-          this.mediaRecorder.stop();
-        }
-      }
+        this.setState({isRecording: true})
+        this.animateIterations();
     }
-
-    this.walkthroughAnimationIndex = undefined;
-    this.iterateAnimationIndex = 0;
-    this.animateIterations();
+  }
+  stopRecording = () => {
+    if (this.mediaRecorder && this.mediaRecorder.state === "recording") {
+      console.log("stopping recording");
+      this.mediaRecorder.stop();
+      this.setState({isRecording: false});
+      //download(this.recordedChunks);
+    }
   }
   setDefaults = (p: p5) => {
     //let center = this.props.GFXProps?.center !== undefined ? [p.width * this.props.GFXProps?.center[0], p.height * this.props.GFXProps?.center[1]] : [0, 0];
@@ -182,20 +211,23 @@ export default class P5Turtle extends React.Component<myProps, myState> {
     let sw = 1;
     let hw = 0.5;
 
-    p.background("#8cdbff");
 
     p.push();
+  
+    
+    //Ground
+    p.push();
+    p.background("#A7ECFF");
+
     p.stroke(0,0,0);
     p.strokeWeight(1);
     p.fill("#41e85a");
     p.rect( -10, 0.8 * p.height ,p.width + 10, p.height);
     p.pop();
 
-    //Frame
+
     p.push();
-
     p.noFill();
-
     let runningOffset = 0;
 
     //Dark yellow
@@ -241,7 +273,7 @@ export default class P5Turtle extends React.Component<myProps, myState> {
     runningOffset += sw;
 
     p.pop();
-
+    p.pop();
   }
   rotateToUp = () => {
     let p = this.p5Context;
@@ -284,8 +316,13 @@ export default class P5Turtle extends React.Component<myProps, myState> {
         p.rotate(Math.random() * a);
         break;
       case "#":
-        if (!l || l==0)  p.stroke(0,0,0);
-        else p.stroke(l, 100, 100);
+        if (!l || l == 0) p.stroke(0, 0, 0);
+        else {
+          let h = params && params[0] ? parseFloat(params[0] as string) : 0;
+          let s = params && params[1] ? parseFloat(params[1] as string) : 100;
+          let b = params && params[2] ? parseFloat(params[2] as string) : 100;
+          p.stroke(h, s, b);
+        }
         break;
       default:
         if (this.customRules[char]) {
@@ -295,7 +332,7 @@ export default class P5Turtle extends React.Component<myProps, myState> {
     }
   }
   moveCenterPoints = (xD: number,yD: number) => {
-    const amount = 0.1;
+    const amount = 0.05;
     let x = xD * amount;
     let y = yD * amount;
     let newCenterPoints = [this.state.centerPoints[0] + x, this.state.centerPoints[1] + y];
@@ -309,36 +346,56 @@ export default class P5Turtle extends React.Component<myProps, myState> {
   };
 
   render() {
-    return (<div className="stack small">
-      <div>
-        <span className="clickable" onClick={() => this.startIterationAnimation()} > animate growth </span>
-        <span className="clickable" onClick={() => this.setState({recordAnimations: !this.state.recordAnimations})}> recording {this.state.recordAnimations ? "on" : "off" } </span>
-        <span  className="clickable" onClick={() => this.moveCenterPoints(-1,0)}> ← </span>
-        <span  className="clickable" onClick={() => this.moveCenterPoints(1,0)}> ➝ </span>
-        <span  className="clickable" onClick={() => this.moveCenterPoints(0,-1)}> ↑ </span>
-        <span  className="clickable" onClick={() => this.moveCenterPoints(0,1)}> ↓ </span>
+    return (
+      <div className="stack small">
+        <div>
+          <span className="clickable" onClick={() => this.startIterationAnimation()}>
+            {" "}
+            animate growth{" "}
+          </span>
+          <span className="clickable" onClick={() => this.toggleRecording()}>
+            {" "}
+            {this.state.isRecording ? "🔴 Stop recording" : "Start recording"}{" "}
+          </span>
+          <span className="clickable" onClick={() => this.moveCenterPoints(-1, 0)}>
+            {" "}
+            ←{" "}
+          </span>
+          <span className="clickable" onClick={() => this.moveCenterPoints(1, 0)}>
+            {" "}
+            ➝{" "}
+          </span>
+          <span className="clickable" onClick={() => this.moveCenterPoints(0, -1)}>
+            {" "}
+            ↑{" "}
+          </span>
+          <span className="clickable" onClick={() => this.moveCenterPoints(0, 1)}>
+            {" "}
+            ↓{" "}
+          </span>
+          <div >
+            <input
+              value={this.state.animationTimeoutSpeed}
+              onChange={(e) => {
+                let s = parseInt(e.target.value);
+                this.setState({ animationTimeoutSpeed: s });
+              }}
+            ></input>
+          </div>
+        </div>
+        <Resizable width={this.state.canvasSize[0]} height={this.state.canvasSize[1]} onResize={this.onResize}>
+          <div ref={this.containerRef} />
+        </Resizable>
       </div>
-      <Resizable width={this.state.canvasSize[0]} height={this.state.canvasSize[1]} onResize={this.onResize} >
-        <div ref={this.containerRef} />
-      </Resizable>
-    </div>)
+    );
   }
 
 }
 
-var recordedChunks: BlobPart[] = [];
 
-function handleDataAvailable(event: BlobEvent) {
-  console.log("data-available");
-  if (event.data.size > 0) {
-    recordedChunks.push(event.data);
-    console.log(recordedChunks);
-    download();
-  } else {
-    // ...
-  }
-}
-function download() {
+
+function download(recordedChunks: BlobPart[]) {
+  console.log("Download triggered", recordedChunks);
   var blob = new Blob(recordedChunks, {
     type: "video/webm"
   });
@@ -347,7 +404,7 @@ function download() {
   document.body.appendChild(a);
   a.href = url;
   a.download = "test.webm";
-  console.log(a);
+  //console.log(a);
   a.click();
   // window.URL.revokeObjectURL(url);
 }

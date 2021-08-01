@@ -1,7 +1,7 @@
 import LSystem, { ParamsValue } from "@bvk/lsystem"
 import p5 from "p5"
-import P5Turtle3D from "../LSDraw/P5Turtle3D"
-import { CompleteLSExample, GFXProps } from "../utils"
+import LSImageViewer3D from "../../components/LSViewer/LSImageViewer3D"
+import { CompleteLSExample, GFXProps } from "../../components/utils"
 
 const lilacData: CompleteLSExample = {
   name: "lilac",
@@ -38,7 +38,7 @@ export default function Lilac() {
 }
 
 const flowerHue = 325;  
-class DrawLilac extends P5Turtle3D {
+class DrawLilac extends LSImageViewer3D {
   windAngle = 0;
   animationSpeed = 600;
   preload = (p: p5) => {

@@ -45,15 +45,17 @@ export default class LSCustomizer extends React.Component<CustomizerProps, Custo
     let newLSData = this.state.LSData;
     newLSData.axiom = axString;
     this.setState({LSData: newLSData});
-    this.resetLS();
+    //this.resetLS();
+    
   }
   updateProductions = (productions: Production[], productionStrings: string[]) => {
     this.productions = productions;
     let newLSData = this.state.LSData;
     newLSData.productions = productionStrings;
     this.setState({LSData: newLSData});
-    this.resetLS();
+    //this.resetLS();
   }
+
   resetLS = () => {
     if (this.axiom && this.productions && this.productions.length > 0) {
       let newLS;
@@ -132,8 +134,7 @@ export default class LSCustomizer extends React.Component<CustomizerProps, Custo
               onClick={(e) => this.resetLS()}
               key="refresh-control"
             >
-              {" "}
-              force refresh{" "}
+              Run LS
             </span>
             {CopyTextButton(this.state.LSData)}
             <PasteOverrideInput />

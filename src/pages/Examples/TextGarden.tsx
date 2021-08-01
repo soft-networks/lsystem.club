@@ -1,7 +1,7 @@
 import LSystem, { ParamsValue } from "@bvk/lsystem";
 import p5 from "p5";
-import P5Turtle from "../LSDraw/P5Turtle";
-import { CompleteLSExample } from "../utils";
+import LSImageViewer2D from "../../components/LSViewer/LSImageViewer2D";
+import { CompleteLSExample } from "../../components/utils";
 
 
 const textFlower: CompleteLSExample = {
@@ -50,7 +50,7 @@ function drawText(p: p5, params: ParamsValue | undefined) {
   p.pop();
 }
 
-class TextTurtle extends P5Turtle {
+class TextTurtle extends LSImageViewer2D {
   xPercent = 1;
   preload = (p:p5) => { 
     p.textFont("helvetica");
