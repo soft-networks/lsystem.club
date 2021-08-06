@@ -2,6 +2,7 @@ import React from "react"
 import { decodeParams, GFXProps, LSProps, defaultLSData, flattenLSProps} from "../components/utils"
 import { RouteComponentProps } from "react-router-dom";
 import LSEditor from "../components/LSEditor";
+import LSTextEditor from "../components/LSTextEditor";
 
 interface PathParams {
   LSStr: string
@@ -37,9 +38,19 @@ export default class InteractiveEditor extends React.Component<RouteComponentPro
   }
   render() {
     return (
-    <div className="padded">
-      <LSEditor initLSProps={this.state.lsProps} initGFXProps={this.state.gfxProps} key={flattenLSProps(this.state.lsProps, "-")}/>
-    </div>)
+      <div className="padded">
+        <LSTextEditor
+          initialCode={"hello world"}
+          style={{ width: "50vw", height: "300px", border: "1px solid black" }}
+        ></LSTextEditor>
+        <LSEditor
+          initLSProps={this.state.lsProps}
+          initGFXProps={this.state.gfxProps}
+          key={flattenLSProps(this.state.lsProps, "-")}
+        />
+      </div>
+    );
   }
 }
+
 

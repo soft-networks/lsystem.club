@@ -16,7 +16,9 @@ em {
   font-style: inherit;
   font-size: 100%;
 }
-
+.blue {
+  color: blue;
+}
 .full-bleed {
   width: 100vw;
   height: 100vh;
