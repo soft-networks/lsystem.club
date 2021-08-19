@@ -35,16 +35,21 @@ export interface GFXPropsComplete {
   animationWaitTime: number
 }
 
-export const defaultGFXProps: GFXPropsComplete = {
+const defaultGFXProps: GFXPropsComplete = {
   renderType: ["2d"],
-  length: 1,
-  angle: 90,
+  length: 10,
+  angle: 30,
   center: [0,0],
   width: 600,
   height: 600,
   strokeWeight: 1,
   backgroundColor:"#eee",
   animationWaitTime: 500
+}
+
+export const completeGfxProps = (gfxProps: GFXProps | undefined) : GFXPropsComplete => {
+  if ( gfxProps === undefined) return defaultGFXProps
+  return {...defaultGFXProps, ...gfxProps};
 }
 
 export type GFXProps = Partial<GFXPropsComplete>

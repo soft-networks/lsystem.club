@@ -1,7 +1,7 @@
 import LSystem, { ParamsValue } from "@bvk/lsystem";
 import p5 from "p5";
 import LSImageViewer2D from "../../components/LSViewer/LSImageViewer2D";
-import { CompleteLSExample } from "../../components/utils";
+import { CompleteLSExample, completeGfxProps } from "../../components/utils";
 
 let webData : CompleteLSExample = {
   lsProps: {
@@ -21,7 +21,7 @@ let webData : CompleteLSExample = {
 export default function WebPage() {
   let ls = new LSystem(webData.lsProps.axiom, webData.lsProps.productions, webData.lsProps.iterations);
   let gfxProps = webData.gfxProps;
-  return <WebTurtle LSystem={ls} GFXProps={gfxProps}/>
+  return <WebTurtle axiom={ls.getIterationAsObject()} gfxProps={completeGfxProps(gfxProps)}  />
 }
 
 

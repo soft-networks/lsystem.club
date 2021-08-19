@@ -1,7 +1,7 @@
 import LSystem from "@bvk/lsystem";
 import React from "react";
 import { Link } from "react-router-dom";
-import { encodeParams, GFXProps, LSProps } from "./utils";
+import { completeGfxProps, encodeParams, GFXProps, LSProps } from "./utils";
 import VizSensor from "react-visibility-sensor";
 import { createLSInWorker } from "./worker";
 import {LSImageViewer2D, LSImageViewer3D, LSTextViewer} from "./LSViewer";
@@ -57,14 +57,14 @@ export class LSPreview extends React.Component<LSPreviewProps, LSPreviewState> {
   };
   getRenderers = () => {
     if (!this.props.gfxProps || !this.props.gfxProps.renderType) {
-      return [<LSImageViewer2D LSystem={this.state.currentLS} GFXProps={this.props.gfxProps}/>]
+      return [<LSImageViewer2D axiom={this.state.currentLS?.getIterationAsObject()} gfxProps={completeGfxProps(this.props.gfxProps)}/>]
     }
     let renderers = [];
     if(this.props.gfxProps.renderType.includes("2d")) {
-      renderers.push( <LSImageViewer2D LSystem={this.state.currentLS} GFXProps={this.props.gfxProps}/>)
+      renderers.push( <LSImageViewer2D axiom={this.state.currentLS?.getIterationAsObject()} gfxProps={completeGfxProps(this.props.gfxProps)}/>)
     } 
     if (this.props.gfxProps.renderType.includes("3d")) {
-      renderers.push(<LSImageViewer3D  LSystem={this.state.currentLS} GFXProps={this.props.gfxProps}/>);
+      renderers.push(<LSImageViewer3D  axiom={this.state.currentLS?.getIterationAsObject()} gfxProps={completeGfxProps(this.props.gfxProps)}/>);
     }
     if (this.props.gfxProps.renderType.includes("text")) {
       renderers.push(LSTextViewer(this.state.currentLS));

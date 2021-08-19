@@ -1,6 +1,6 @@
 import React, {createRef, useEffect, useRef} from "react";
 import LSystem, { Axiom } from "@bvk/lsystem"
-import { GFXProps, GFXPropsComplete, P5CanvasType, defaultGFXProps } from "../utils";
+import { GFXProps, GFXPropsComplete, P5CanvasType, completeGfxProps } from "../utils";
 import p5 from "p5"
 import { useState } from "react";
 import { useCallback } from "react";
@@ -25,7 +25,7 @@ const LSImageViewerParent: React.FunctionComponent<LSImageViewerParentProps> = (
   const canvasTypeString = useRef<P5CanvasType>("p2d");
   const canvasID = useRef<string>("CANVAS-P52D");
   
-  const [currentGFXProps, setCurrentGFXProps] = useState<GFXPropsComplete>( { ...defaultGFXProps, ...GFXProps});
+  const [currentGFXProps, setCurrentGFXProps] = useState<GFXPropsComplete>( completeGfxProps(GFXProps));
   
   //🔺 Helper functions to draw. Can be overriden by children
   const defaultSetup = useCallback((p : p5) => {
@@ -105,7 +105,7 @@ const LSImageViewerParent: React.FunctionComponent<LSImageViewerParentProps> = (
   }, [])
 
   useEffect(()=> {
-    setCurrentGFXProps({...defaultGFXProps, ...GFXProps})
+    setCurrentGFXProps(completeGfxProps(GFXProps))
     redraw();
   }, [GFXProps, redraw])
   

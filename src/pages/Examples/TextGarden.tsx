@@ -1,7 +1,7 @@
 import LSystem, { ParamsValue } from "@bvk/lsystem";
 import p5 from "p5";
 import LSImageViewer2D from "../../components/LSViewer/LSImageViewer2D";
-import { CompleteLSExample } from "../../components/utils";
+import { CompleteLSExample, completeGfxProps } from "../../components/utils";
 
 
 const textFlower: CompleteLSExample = {
@@ -37,7 +37,7 @@ export default function textGarden() {
   let gfxProps = textFlower.gfxProps
   console.log(ls.getAllIterationsAsString());
 
-  return (<TextTurtle LSystem={ls} GFXProps={gfxProps}/>)
+  return (<TextTurtle axiom={ls.getIterationAsObject()} gfxProps={completeGfxProps(gfxProps)} />)
 }
 function drawText(p: p5, params: ParamsValue | undefined) {
   let index =  params && params.length == 1 ? parseInt(params[0]  as string) : -1;
@@ -54,13 +54,6 @@ class TextTurtle extends LSImageViewer2D {
   xPercent = 1;
   preload = (p:p5) => { 
     p.textFont("helvetica");
-  }
-  setDefaults = (p: p5) => {
-    let center = this.props.GFXProps?.center !== undefined ? [p.width * this.props.GFXProps?.center[0], p.height * this.props.GFXProps?.center[1]] : [0, 0];
-    let sw = this.props.GFXProps?.strokeWeight ? this.props.GFXProps?.strokeWeight : 1;
-    let defaultLength = this.props.GFXProps?.length ? this.props.GFXProps?.length : 0.01 * p.height;
-    let defaultAngle = this.xPercent * 5;
-    return {center, sw, defaultLength, defaultAngle}
   }
   customRules = {
     "T": drawText 

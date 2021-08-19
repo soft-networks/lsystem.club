@@ -1,7 +1,7 @@
 import LSystem, { ParamsValue } from "@bvk/lsystem"
 import p5 from "p5"
 import LSImageViewer3D from "../../components/LSViewer/LSImageViewer3D"
-import { CompleteLSExample, GFXProps } from "../../components/utils"
+import { CompleteLSExample, completeGfxProps, GFXProps } from "../../components/utils"
 
 const lilacData: CompleteLSExample = {
   name: "lilac",
@@ -32,7 +32,7 @@ export default function Lilac() {
 
   return (
     <div > 
-      <DrawLilac LSystem={ls} GFXProps={gfxProps} /> 
+      <DrawLilac axiom={ls.getIterationAsObject()} gfxProps={completeGfxProps(gfxProps)} /> 
       
     </div>)
 }

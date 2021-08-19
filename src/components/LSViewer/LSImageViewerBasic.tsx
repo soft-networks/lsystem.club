@@ -33,6 +33,9 @@ export default class LSImageViewerBasic extends React.Component<LSImageViewerBas
     if (this.containerRef.current) 
       new p5(this.sketch, this.containerRef.current);
   }
+  componentDidUpdate() {
+    this.redraw();
+  }
 
   defaultSetup = (p: p5) => {
     let cnv = p.createCanvas(this.props.gfxProps.width, this.props.gfxProps.height, this.canvasType);
@@ -47,6 +50,7 @@ export default class LSImageViewerBasic extends React.Component<LSImageViewerBas
     //Do nothing in the base case
   }
   redraw = () => {
+    console.log("Redrawing graphic");
     if (this.p5Context !== undefined) {
       this.p5Context.clear();
       this.p5Context.background(this.props.gfxProps.backgroundColor);
@@ -73,8 +77,11 @@ export default class LSImageViewerBasic extends React.Component<LSImageViewerBas
     p.pop();
   }
   drawCurrentAxiom = (p: p5) => {
-    p.fill(Math.random() , 100 , 100);
+    p.fill(Math.random() * 100 , 100 , 100);
     p.ellipse(0,0,100,100);
+  }
+  startIterationAnimation = () => {
+    //TODO
   }
   sketch = (p: p5) => {
  
@@ -88,4 +95,9 @@ export default class LSImageViewerBasic extends React.Component<LSImageViewerBas
 
     }
   };
+  render() {
+    return (
+          <div ref={this.containerRef} />
+    );
+  }
 }

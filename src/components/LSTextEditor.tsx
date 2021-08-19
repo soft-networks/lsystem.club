@@ -20,7 +20,6 @@ const LSTextEditor: React.FunctionComponent<CodeEditorProps> = ({ initialCode , 
   const highlightCharacter = (character: string) => {
     let color: string = tokenColors.symbol
     if (character.match('[A-Za-z]')) {  
-      console.log("Character matched", character, charactersSeen.current);
       if (charactersSeen.current[character]) {
        color = charactersSeen.current[character]
       } else {
