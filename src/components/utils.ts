@@ -1,3 +1,4 @@
+import p5 from "p5";
 import queryString from "query-string"
 
 
@@ -8,7 +9,7 @@ export const defaultLSData = {
   iterations: 10
 }
 
-
+export type P5CanvasType = "webgl" | "p2d"
 export interface CompleteLSExample {
   lsProps: LSProps
   gfxProps?: GFXProps
@@ -22,15 +23,18 @@ export interface LSProps {
 }
 
 type renderTypes = "2d" | "3d" | "text" | "pixel";
-export interface GFXProps {
-  renderType?: renderTypes[]
-  length?: number
-  angle?: number
-  center?: number[]
-  width?: number
-  height?: number
-  strokeWeight?: number
+export interface GFXPropsComplete {
+  renderType: renderTypes[]
+  length: number
+  angle: number
+  center: number[]
+  width: number
+  height: number
+  strokeWeight: number
+  backgroundColor: string
 }
+
+export type GFXProps = Partial<GFXPropsComplete>
 
 
 export function flattenLSProps(ls: LSProps, delimiter: string) {

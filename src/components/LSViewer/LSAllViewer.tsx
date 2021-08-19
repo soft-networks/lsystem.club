@@ -3,6 +3,7 @@ import React from "react"
 import { GFXProps } from "../utils";
 import LSImageViewer2D from "./LSImageViewer2D";
 import LSImageViewer3D from "./LSImageViewer3D";
+import LSImageViewerParent from "./LSImageViewerParent";
 import LSTextViewer from "./LSTextViewer"
 
 /* LSViewer.ts
@@ -17,12 +18,21 @@ export default class LSAllViewer extends React.Component<myProps>{
   
   render() {
     return (
-      <div className="canvas-border stack border"> 
-        <LSImageViewer2D key="gfx-viewer" LSystem={this.props.LSystem} GFXProps={this.props.gfxProps} />        
-        <LSImageViewer3D key="gfx-3d-viewer" LSystem={this.props.LSystem} GFXProps={this.props.gfxProps}/>
-        <div key="text-viewer" className="black-border" style={{width: "600px", height: "600px"}} > {LSTextViewer(this.props.LSystem)} </div>
+      <div className="canvas-border stack border">
+        <LSImageViewerParent
+          key="test"
+          LSystem={this.props.LSystem}
+          initGFXProps={this.props.gfxProps}
+          drawCommand={this.props.LSystem?.getIterationAsObject()}
+        />
+        {/* <LSImageViewer2D key="gfx-viewer" LSystem={this.props.LSystem} GFXProps={this.props.gfxProps} />        
+        <LSImageViewer3D key="gfx-3d-viewer" LSystem={this.props.LSystem} GFXProps={this.props.gfxProps}/> */}
+        <div key="text-viewer" className="black-border" style={{ width: "600px", height: "600px" }}>
+          {" "}
+          {LSTextViewer(this.props.LSystem)}{" "}
+        </div>
       </div>
-    )
+    );
   }
 }
 
