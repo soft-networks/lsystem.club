@@ -1,6 +1,6 @@
 import React, {createRef, useEffect, useRef} from "react";
 import LSystem, { Axiom } from "@bvk/lsystem"
-import { GFXProps, GFXPropsComplete, P5CanvasType } from "../utils";
+import { GFXProps, GFXPropsComplete, P5CanvasType, defaultGFXProps } from "../utils";
 import p5 from "p5"
 import { useState } from "react";
 import { useCallback } from "react";
@@ -11,16 +11,7 @@ interface LSImageViewerParentProps {
   initGFXProps?: GFXProps
 }
 
-const defaultGFXProps: GFXPropsComplete = {
-  renderType: ["2d"],
-  length: 1,
-  angle: 90,
-  center: [0,0],
-  width: 600,
-  height: 600,
-  strokeWeight: 1,
-  backgroundColor:"#eee"
-}
+
 
 const LSImageViewerParent: React.FunctionComponent<LSImageViewerParentProps> = ({
   LSystem = undefined,

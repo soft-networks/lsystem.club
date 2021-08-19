@@ -32,6 +32,19 @@ export interface GFXPropsComplete {
   height: number
   strokeWeight: number
   backgroundColor: string
+  animationWaitTime: number
+}
+
+export const defaultGFXProps: GFXPropsComplete = {
+  renderType: ["2d"],
+  length: 1,
+  angle: 90,
+  center: [0,0],
+  width: 600,
+  height: 600,
+  strokeWeight: 1,
+  backgroundColor:"#eee",
+  animationWaitTime: 500
 }
 
 export type GFXProps = Partial<GFXPropsComplete>
