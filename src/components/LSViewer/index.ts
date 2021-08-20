@@ -1,7 +1,6 @@
 import LSTextViewer from "./LSTextViewer"
-import LSImageViewer2D from "./LSImageViewer2D"
-import LSImageViewer3D from "./LSImageViewer3D"
 import LSAllViewer from "./LSAllViewer"
+import LSImageViewer, {LSImageViewer2D, LSImageViewer3D} from "./LSImageViewer"
 
 export default LSAllViewer
-export {LSTextViewer, LSImageViewer2D as LSImageViewer2D, LSImageViewer3D as LSImageViewer3D}
+export {LSTextViewer, LSImageViewer, LSImageViewer2D, LSImageViewer3D}

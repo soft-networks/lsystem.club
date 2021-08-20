@@ -1,6 +1,5 @@
 import p5 from "p5";
 import LSImageViewer2D from "./LSImageViewer2D";
-import '../../styles/resizable.css'
 import { draw3DChar } from "./drawChar";
 
 export default class LSImageViewer3D extends LSImageViewer2D {
@@ -16,11 +15,9 @@ export default class LSImageViewer3D extends LSImageViewer2D {
   preload = (p: p5) => {
    
   }
-  moveToCenter = () => {
-    //Do nothing, were already there
+  moveToCanvasCenter = () => {
     let p = this.p5Context;
     if (!p) return;
-    //p.camera(0,0,0, 0, 0, 0, 0, 1, 0);
   }
  
 }

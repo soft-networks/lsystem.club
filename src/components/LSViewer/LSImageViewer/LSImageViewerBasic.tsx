@@ -1,5 +1,5 @@
 import React from "react"
-import {  GFXPropsComplete, P5CanvasType } from "../utils";
+import {  GFXPropsComplete, P5CanvasType } from "../../utils";
 import {Axiom} from "@bvk/lsystem"
 import p5 from "p5";
 

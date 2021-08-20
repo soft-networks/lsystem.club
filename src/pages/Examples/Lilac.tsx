@@ -1,6 +1,6 @@
 import LSystem, { ParamsValue } from "@bvk/lsystem"
 import p5 from "p5"
-import LSImageViewer3D from "../../components/LSViewer/LSImageViewer3D"
+import {LSImageViewer3D} from "../../components/LSViewer"
 import { CompleteLSExample, completeGfxProps, GFXProps } from "../../components/utils"
 
 const lilacData: CompleteLSExample = {

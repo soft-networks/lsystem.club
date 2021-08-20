@@ -1,5 +1,4 @@
 import p5 from "p5"
-import '../../styles/resizable.css'
 import LSImageViewerBasic from "./LSImageViewerBasic";
 import { draw2DChar } from "./drawChar";
 

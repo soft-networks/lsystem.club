@@ -10,6 +10,8 @@ export const defaultLSData = {
 }
 
 export type P5CanvasType = "webgl" | "p2d"
+export type renderTypes = "2d" | "3d" | "text" | "pixel";
+
 export interface CompleteLSExample {
   lsProps: LSProps
   gfxProps?: GFXProps
@@ -22,7 +24,6 @@ export interface LSProps {
   iterations: number
 }
 
-type renderTypes = "2d" | "3d" | "text" | "pixel";
 export interface GFXPropsComplete {
   renderType: renderTypes[]
   length: number

@@ -1,6 +1,6 @@
 import LSystem, { ParamsValue } from "@bvk/lsystem";
 import p5 from "p5";
-import LSImageViewer2D from "../../components/LSViewer/LSImageViewer2D";
+import LSImageViewer2D from "../../components/LSViewer/LSImageViewer/LSImageViewer2D";
 import { CompleteLSExample, completeGfxProps } from "../../components/utils";
 
 let webData : CompleteLSExample = {
