@@ -8,6 +8,7 @@ import { createLSInWorker } from "../worker";
 import LSConsole from "./LSStatusConsole";
 import LSCodeEditor from "./LSCodeEditor";
 import { GFXPropsCustomizer } from "./LSGFXEditor";
+import { useRef } from "react";
 
 interface LSEditorProps {
   onLSReset(LS: LSystem): void;
@@ -16,7 +17,6 @@ interface LSEditorProps {
   initCode?: string
   initGFXProps?: GFXProps
 }
-
 
 
 export const LSEditor: React.FunctionComponent<LSEditorProps> = ({
@@ -31,8 +31,52 @@ export const LSEditor: React.FunctionComponent<LSEditorProps> = ({
   const [status, setStatus] = useState<LSStatus>();
   const [gfxProps, setGFXProps] = useState<GFXPropsComplete>(completeGfxProps(initGFXProps));
 
-  const runCurrentLSystem = useCallback((lsProps) => {
-    console.log("Gonna run current LS");
+  const lSystemNeedsReset = useRef<boolean>(true);
+  const gfxPropsNeedsReset = useRef<boolean>(true);
+  const firstRun = useRef<boolean>(true);
+
+  useEffect(() => {
+    if (lSystem)
+      onLSReset(lSystem);
+  }, [lSystem, onLSReset])
+
+  const updateCurrentLines = useCallback( (newLines: string[]) => {
+    // console.log("lines updated", newLines);
+    setCurrentLines((prev) => {
+      lSystemNeedsReset.current = true; 
+      return newLines;
+    });
+    
+  }, [setCurrentLines]);
+
+  const updateCurrentGFXProps = useCallback((gfxPropUpdate: GFXProps) => {
+    // console.log("Gfx props updated"); 
+    setGFXProps((prevProps) => {
+      if (gfxPropUpdate.iterations !== undefined && gfxPropUpdate.iterations !== prevProps.iterations) {
+        lSystemNeedsReset.current = true;
+      } else {
+        gfxPropsNeedsReset.current = true;
+      }
+      return {...prevProps, ...gfxPropUpdate}
+    })
+  }, [setGFXProps])
+
+  const runLS = () => {
+    // console.log("Time to run L-System");
+    if (lSystemNeedsReset.current) {
+      // console.log("recreating LS");
+      parseLinesAndCreateLSystem();
+      lSystemNeedsReset.current = false;
+    }
+    if (gfxPropsNeedsReset.current) {
+      // console.log("recreating GFX");
+      onGFXPropsUpdate(gfxProps);
+      gfxPropsNeedsReset.current = false;
+    }
+  }
+
+  const createLSystem = useCallback((lsProps) => {
+    // console.log("Gonna run current LS");
     try {
       setStatus({ state: "compiling" });
       createLSInWorker(lsProps).then((updatedLS) => {
@@ -44,14 +88,10 @@ export const LSEditor: React.FunctionComponent<LSEditorProps> = ({
     }
   }, []);
 
-  useEffect(() => {
-    if (lSystem)
-      onLSReset(lSystem);
-  }, [lSystem])
-
-  const runLS = () => {
-    if (currentLines.length < 1) {
-      const noAxiomError = new Error("An LSystem needs at least one axiom and a production"); 
+  const parseLinesAndCreateLSystem = () => {
+    if (currentLines.length < 1) { 
+      console.log(currentLines);
+      const noAxiomError = new Error("An LSystem needs at least one axiom"); 
       setStatus({ state: "error", errors: [ noAxiomError] })
     } else {
       
@@ -79,7 +119,7 @@ export const LSEditor: React.FunctionComponent<LSEditorProps> = ({
       } else {
         // @ts-ignore: Ignoring let error.
         setStatus({state: "ready"});
-        runCurrentLSystem({axiom: axiomLine, productions: productionLines, iterations: gfxProps.iterations}); 
+        createLSystem({axiom: axiomLine, productions: productionLines, iterations: gfxProps.iterations}); 
       }
     }
   }
@@ -91,12 +131,12 @@ export const LSEditor: React.FunctionComponent<LSEditorProps> = ({
           Run LS
         </span>
       </div>
-      <LSCodeEditor initialCode={initCode} onCodeWasEdited={setCurrentLines} />
-      <LSConsole status={status} />
+      <LSCodeEditor initialCode={initCode} onCodeWasEdited={updateCurrentLines} className="black-border" />
       <GFXPropsCustomizer
         gfxProps={completeGfxProps(initGFXProps)}
-        GFXPropsUpdated={(gfxProps) => setGFXProps(completeGfxProps(gfxProps))}
+        GFXPropsUpdated={updateCurrentGFXProps}
       />
+      <LSConsole status={status} />
     </div>
   );
 };

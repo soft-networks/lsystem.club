@@ -1,40 +1,48 @@
 //GFXPropsCustomizer.js
-import { completeGfxProps, GFXProps, GFXPropsComplete } from "../utils";
+import {  GFXProps, GFXPropsComplete } from "../utils";
 import React from  "react";
 
+interface GFXPropsCustomizerState {
+  length: string,
+  angle: string,
+  iterations: string
+}
 export class GFXPropsCustomizer extends React.Component<
   { gfxProps: GFXPropsComplete; GFXPropsUpdated(gfxProps: GFXProps): void },
-  GFXProps
+  GFXPropsCustomizerState
 > {
-  state: GFXProps = {
-    length: this.props.gfxProps.length,
-    angle: this.props.gfxProps.angle,
-    iterations: this.props.gfxProps.iterations,
+  state = {
+    length: '' + this.props.gfxProps.length,
+    angle: '' + this.props.gfxProps.angle,
+    iterations:  '' + this.props.gfxProps.iterations,
   };
   updateAngle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let newAngle = parseFloat(e.target.value);
+    let newAngle = e.target.value;
     const newState = { ...this.state, ...{ angle: newAngle } };
     this.setState(newState);
-    this.props.GFXPropsUpdated(newState);
+    
+    this.props.GFXPropsUpdated({angle: parseFloat(newAngle) || 1});
   };
   updateLength = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let newLength = parseFloat(e.target.value);
+    let newLength = e.target.value;
     const newState = { ...this.state, ...{ length: newLength } };
     this.setState(newState);
-    this.props.GFXPropsUpdated(newState);
+
+    this.props.GFXPropsUpdated({length: parseFloat(newLength) || 0.1})
   };
   updateIterations = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let newIterations = parseInt(e.target.value);
+
+    let newIterations = e.target.value;
     const newState = { ...this.state, ...{ iterations: newIterations } };
     this.setState(newState);
-    this.props.GFXPropsUpdated(newState);
+    this.props.GFXPropsUpdated({iterations: parseInt(newIterations) || 1});
   };
   getControls = () => {
     let angleControl = (
       <div key="customize-angle">
         {" "}
         <label> Angle </label>
-        <input value={this.state.angle} onChange={this.updateAngle} type="number" />
+        <input value={this.state.angle} onChange={this.updateAngle} type="number"/>
       </div>
     );
     let lengthControl = (
@@ -48,7 +56,7 @@ export class GFXPropsCustomizer extends React.Component<
       <div key="iteration-control">
         {" "}
         <label> Iterations </label>{" "}
-        <input type="number" onChange={this.updateIterations} value={this.state.iterations} min={0} />
+        <input type="number" onChange={this.updateIterations} value={this.state.iterations} />
       </div>
     );
     return [iterationController, angleControl, lengthControl];

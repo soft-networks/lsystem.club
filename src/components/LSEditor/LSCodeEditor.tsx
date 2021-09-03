@@ -5,6 +5,7 @@ import { useEffect } from "react";
 interface CodeEditorProps {
   initialCode?: string;
   style?: React.CSSProperties
+  className?: string,
   onCodeWasEdited: (lines: string[]) => void
 }
 
@@ -18,7 +19,12 @@ const splitLines = ( rawCode: string) => {
   return rawCode.split("\n").map((line) => line + "\n");
 }
 
-const LSCodeEditor: React.FunctionComponent<CodeEditorProps> = ({ initialCode , style, onCodeWasEdited}) => {
+const lineIsComment = (line: string) => {
+  const lineNoWhitespace = line.replace(/\s/g, "");
+  return lineNoWhitespace[0] === "*"
+}
+
+const LSCodeEditor: React.FunctionComponent<CodeEditorProps> = ({ initialCode , style, onCodeWasEdited, className}) => {
 
   const [code, setCode] = React.useState<string>(initialCode || "");
   const charactersSeen = React.useRef<{ [key: string]: string}>({});
@@ -39,13 +45,17 @@ const LSCodeEditor: React.FunctionComponent<CodeEditorProps> = ({ initialCode , 
     return <span style={{color: color}}>{character}</span>
   }
 
+  //TODO: Move this up into LSEditor, because its running too often right now :)
   useEffect(() => {
-    onCodeWasEdited(splitLines(code));
+    const lines = splitLines(code);
+    const relevantLines = lines.filter((line) => !lineIsComment(line) && line !== "\n");
+    const linesNoWhitespace = relevantLines.map((line) => line.replace(/\s/g, ""))
+    //console.log(lines, relevantLines);
+    onCodeWasEdited(linesNoWhitespace);
   }, [onCodeWasEdited, code]);
 
   const highlightLine = (line: string, lineNumber: number): React.ReactNode => {
-    const lineNoWhitespace = line.replace(/\s/g, "");
-    if (lineNoWhitespace[0] === "*") {
+    if (lineIsComment(line)) {
       return <span style={{ color: tokenColors.comment }}>{line}</span>;
     }
     const characters = line.split("");
@@ -59,7 +69,14 @@ const LSCodeEditor: React.FunctionComponent<CodeEditorProps> = ({ initialCode , 
 
 
   return (
-    <Editor value={code} onValueChange={(newCode) => setCode(newCode)} style={style} highlight={syntaxHighlightAndUpdateLS} padding={10}/>
+    <Editor
+      value={code}
+      onValueChange={(newCode) => setCode(newCode)}
+      style={style}
+      highlight={syntaxHighlightAndUpdateLS}
+      padding={10}
+      className={className}
+    />
   );
 };
 

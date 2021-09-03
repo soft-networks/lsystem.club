@@ -24,7 +24,7 @@ const statusToEl = (status: LSStatus | undefined) : JSX.Element => {
   }
   switch (status.state) {
     case "error":
-      return <div> <span> Status has error</span> <ul> { status.errors && status.errors.map((err) => <li> {err.message} </li>)} </ul></div> 
+      return <div> <span> Status has error</span> <ul> { status.errors && status.errors.map((err, i) => <li key={`error-${i}`}> {err.message} </li>)} </ul></div> 
     case "compiling":
       return <div> Compiling </div>
     case "compiled":
