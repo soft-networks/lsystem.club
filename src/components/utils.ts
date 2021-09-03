@@ -18,6 +18,10 @@ export interface CompleteLSExample {
   name?: string
 }
 
+export interface LSStatus {
+  state : "compiling" | "compiled" | "error" | "ready",
+  errors?: Error[]
+}
 export interface LSProps {
   axiom: string
   productions: string[]
@@ -33,7 +37,8 @@ export interface GFXPropsComplete {
   height: number
   strokeWeight: number
   backgroundColor: string
-  animationWaitTime: number
+  animationWaitTime: number,
+  iterations: number
 }
 
 const defaultGFXProps: GFXPropsComplete = {
@@ -45,7 +50,8 @@ const defaultGFXProps: GFXPropsComplete = {
   height: 600,
   strokeWeight: 1,
   backgroundColor:"#eee",
-  animationWaitTime: 500
+  animationWaitTime: 500,
+  iterations: 1
 }
 
 export const completeGfxProps = (gfxProps: GFXProps | undefined) : GFXPropsComplete => {

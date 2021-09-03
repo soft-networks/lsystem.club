@@ -1,9 +1,11 @@
 import React from "react";
 import Editor from "react-simple-code-editor";
+import { useEffect } from "react";
 
 interface CodeEditorProps {
   initialCode?: string;
   style?: React.CSSProperties
+  onCodeWasEdited: (lines: string[]) => void
 }
 
 const tokenColors = {
@@ -12,7 +14,11 @@ const tokenColors = {
   letterColor: (n: number) => `hsl(${n * 20 % 360},50%,50%)`
 }
 
-const LSTextEditor: React.FunctionComponent<CodeEditorProps> = ({ initialCode , style}) => {
+const splitLines = ( rawCode: string) => {
+  return rawCode.split("\n").map((line) => line + "\n");
+}
+
+const LSCodeEditor: React.FunctionComponent<CodeEditorProps> = ({ initialCode , style, onCodeWasEdited}) => {
 
   const [code, setCode] = React.useState<string>(initialCode || "");
   const charactersSeen = React.useRef<{ [key: string]: string}>({});
@@ -33,6 +39,10 @@ const LSTextEditor: React.FunctionComponent<CodeEditorProps> = ({ initialCode , 
     return <span style={{color: color}}>{character}</span>
   }
 
+  useEffect(() => {
+    onCodeWasEdited(splitLines(code));
+  }, [onCodeWasEdited, code]);
+
   const highlightLine = (line: string, lineNumber: number): React.ReactNode => {
     const lineNoWhitespace = line.replace(/\s/g, "");
     if (lineNoWhitespace[0] === "*") {
@@ -43,13 +53,14 @@ const LSTextEditor: React.FunctionComponent<CodeEditorProps> = ({ initialCode , 
   };
 
   const syntaxHighlightAndUpdateLS = (rawCode: string): React.ReactNode => {
-    const lines = rawCode.split("\n").map((line) => line + "\n");
+    const lines = splitLines(rawCode);  
     return lines.map((line, i) => highlightLine(line, i));
   };
+
 
   return (
     <Editor value={code} onValueChange={(newCode) => setCode(newCode)} style={style} highlight={syntaxHighlightAndUpdateLS} padding={10}/>
   );
 };
 
-export default LSTextEditor;
+export default LSCodeEditor;

@@ -1,8 +1,9 @@
 import React from "react";
 import LSystem from "@bvk/lsystem";
-import LSCustomizer from "./LSCustomizer";
+import LSCustomizer from "./LSEditor/LSCustomizer";
 import { GFXProps, LSProps } from "./utils";
 import LSAllViewer from "./LSViewer";
+import { LSEditor } from "./LSEditor/LSEditor";
 
 
 /* LSEditor.ts
@@ -17,7 +18,7 @@ interface LSEditorProps {
   initLSProps: LSProps
   initGFXProps?: GFXProps
 }
-export default class LSEditor extends React.Component<LSEditorProps, LSEditorState> {
+export default class LSEditAndView extends React.Component<LSEditorProps, LSEditorState> {
   state: LSEditorState = {
       LSystem: undefined,
       gfxProps: this.props.initGFXProps || {}
@@ -33,18 +34,16 @@ export default class LSEditor extends React.Component<LSEditorProps, LSEditorSta
   }
   render() {
       return (
-      <div className="side-by-side">
-          <LSCustomizer
-          onLSIterated={this.onLSIterated}
-          onLSReset={this.onLSReset}
-          onGFXPropsUpdate={this.onGFXPropsUpdated}
-          initLSProps={this.props.initLSProps}
-          initGFXProps={this.props.initGFXProps}
-          key="LSCustomizer"
+        <div className="side-by-side">
+          <LSEditor
+            onLSReset={this.onLSReset}
+            onLSIterated={this.onLSIterated}
+            onGFXPropsUpdate={this.onGFXPropsUpdated}
+            initCode="AF"
           />
-          <LSAllViewer LSystem={this.state.LSystem} gfxProps={this.state.gfxProps}/>
-      </div >
-      )
+          <LSAllViewer LSystem={this.state.LSystem} gfxProps={this.state.gfxProps} />
+        </div>
+      );
     }
 }
 

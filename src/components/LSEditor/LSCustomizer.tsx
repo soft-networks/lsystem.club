@@ -3,7 +3,8 @@ import LSystem, { Axiom, parseAxiom, parseProduction, Production } from "@bvk/ls
 import React from "react"
 import CopyToClipboard from "react-copy-to-clipboard";
 import { Link } from "react-router-dom";
-import { encodeParams, flattenLSProps, GFXProps, LSProps } from "./utils";
+import { encodeParams, flattenLSProps, GFXProps, LSProps, completeGfxProps } from "../utils";
+import { GFXPropsCustomizer } from "./LSGFXEditor";
 
 interface CustomizerProps {
   onLSReset(LS: LSystem): void;
@@ -147,7 +148,7 @@ export default class LSCustomizer extends React.Component<CustomizerProps, Custo
         <div className="stack small">
           <em> GFX Properties </em>
           <GFXPropsCustomizer
-            gfxProps={this.props.initGFXProps || {}}
+            gfxProps={completeGfxProps(this.props.initGFXProps)}
             GFXPropsUpdated={this.props.onGFXPropsUpdate}
           />
         </div>
@@ -366,33 +367,4 @@ class ProductionsCustomizer extends React.Component<ManyProductionProps, ManyPro
   }
 }
 
-//GFXPropsCustomizer.js
-class GFXPropsCustomizer extends React.Component<{ gfxProps: GFXProps, GFXPropsUpdated(gfxProps: GFXProps): void }, GFXProps> {
-  state: GFXProps = {
-    length: this.props.gfxProps.length || 10,
-    angle: this.props.gfxProps.angle || 10
-  }
-  updateAngle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let newAngle = parseFloat(e.target.value);
-    let newState = this.state;
-    newState.angle = newAngle;
-    this.setState(newState);
-    this.props.GFXPropsUpdated(newState);
-  }
-  updateLength = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let newLength = parseFloat(e.target.value);
-    let newState = this.state;
-    newState.length = newLength;
-    this.setState(newState);
-    this.props.GFXPropsUpdated(newState);
-  }
-  getControls = () => {
-    let angleControl = (<div key="customize-angle" > <label> Angle </label><input value={this.state.angle} onChange={this.updateAngle} type="number" /></div>)
-    let lengthControl = (<div key="customize-length"> <label> Length </label><input value={this.state.length} onChange={this.updateLength} type="number" /></div>)
-    return [angleControl, lengthControl]
-  }
-  render = () => {
-    return this.getControls();
-  }
 
-}
