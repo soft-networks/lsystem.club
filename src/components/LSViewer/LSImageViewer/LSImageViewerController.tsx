@@ -42,28 +42,33 @@ const LSImageViewerController : React.FunctionComponent<LSImageViewerControllerP
   const currentlyAnimating = useRef<boolean>(false);
   const activeInterval = useRef<NodeJS.Timeout>();
 
+  //Trigger re-render if the gxfProps, current axiom, or viewer type change
   const getViewer = useCallback(() => {
     const viewerProps = { gfxProps: completeGfxProps(props.gfxProps), axiom: currentAxiom}
     return viewerType === "3d" ? <LSImageViewer2D {...viewerProps} />: <LSImageViewer3D {...viewerProps} />
   }, [ props.gfxProps, currentAxiom, viewerType])
 
+  //When the lsystem changes, cancel any anim timers and set current iterations + all current axioms
   useEffect( () => {
     if (activeInterval.current) clearTimeout(activeInterval.current);
     setCurrentIteration(props.lSystem.iterations);
     setAllCurrentAxioms(props.lSystem.getAllIterationsAsObject())
   }, [ props.lSystem])
 
+  //When the currentIteration or all current Axioms change, change current axiom (trigger-re-render)
   useEffect( () => {
     console.log("Changing axiom... should re-render")
     setCurrentAxiom(allCurrentAxioms[currentIteration]);
   }, [currentIteration, allCurrentAxioms])
 
+  //If ls or gfx props change, viewer type may change
   useEffect(() => {
     const newViewerType = getViewerType(props.lSystem, props.gfxProps);
     setViewerType(newViewerType);
   }, [props.lSystem, props.gfxProps])
 
 
+  //Helper functions for animations
   const stopIterationAnimation = () => {
     console.log("Anim stop", currentIteration);
     currentlyAnimating.current = false;
@@ -73,12 +78,16 @@ const LSImageViewerController : React.FunctionComponent<LSImageViewerControllerP
     currentlyAnimating.current = true;
     setCurrentIteration(0);
   }
+  //Animation is just powered by changes to currentIteration.
+  //The currentIteration changes itself every x seconds.
+  //STOP IF:  the LS changes the iters set to the stopping point OR forced stop 
   useEffect(() => {
     console.log("Current iteration changed", currentIteration);
+    
     if (currentIteration === props.lSystem.iterations || currentlyAnimating.current === false) {
       stopIterationAnimation();
     } else {
-      activeInterval.current = setTimeout(() => setCurrentIteration(currentIteration +1), 100);
+      activeInterval.current = setTimeout(() => setCurrentIteration(currentIteration +1), props.gfxProps?.animationWaitTime || completeGfxProps(undefined).animationWaitTime);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentIteration, props.lSystem.iterations])
