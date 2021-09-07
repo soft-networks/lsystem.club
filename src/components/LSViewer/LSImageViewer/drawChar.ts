@@ -42,7 +42,8 @@ export const draw2DChar = (p : p5, char: string, l: number, a: number, params: P
       }
       break;
     default:
-      console.log(char + " isn't turtle command");
+      //console.log(char + " isn't turtle command");
+      break;
   }
 }
 

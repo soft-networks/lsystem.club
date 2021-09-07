@@ -1,14 +1,16 @@
 
 
-import LSystem, { Axiom, parseAxiom, parseProduction, Production } from "@bvk/lsystem"
+import LSystem, {  parseAxiom, parseProduction } from "@bvk/lsystem"
 import React, { useCallback, useState } from "react"
 import { useEffect } from "react";
-import {completeGfxProps, GFXProps, GFXPropsComplete, LSProps, LSStatus} from "../utils"
+import {completeGfxProps, decodeParams, encodeParams, GFXProps, GFXPropsComplete, LSProps, LSStatus} from "../utils"
 import { createLSInWorker } from "../worker";
 import LSConsole from "./LSStatusConsole";
 import LSCodeEditor from "./LSCodeEditor";
 import { GFXPropsCustomizer } from "./LSGFXEditor";
 import { useRef } from "react";
+import { lineIsComment, splitLines } from "./codeSyntax";
+import copy from "copy-to-clipboard"
 
 interface LSEditorProps {
   onLSReset(LS: LSystem): void;
@@ -30,24 +32,30 @@ export const LSEditor: React.FunctionComponent<LSEditorProps> = ({
   const [currentLines, setCurrentLines] = useState<string[]>([]);
   const [status, setStatus] = useState<LSStatus>();
   const [gfxProps, setGFXProps] = useState<GFXPropsComplete>(completeGfxProps(initGFXProps));
+  const [currentCode, setCurrentCode] = useState<string>(initCode || "");
 
   const lSystemNeedsReset = useRef<boolean>(true);
   const gfxPropsNeedsReset = useRef<boolean>(true);
-  const firstRun = useRef<boolean>(true);
 
   useEffect(() => {
     if (lSystem)
       onLSReset(lSystem);
   }, [lSystem, onLSReset])
 
-  const updateCurrentLines = useCallback( (newLines: string[]) => {
-    // console.log("lines updated", newLines);
+  const updateCurrentCode = useCallback((newCode: string) => {
+    setCurrentCode(newCode);
+    
+    let lines = splitLines(newCode);
+    const relevantLines = lines.filter((line) => !lineIsComment(line) && line !== "\n");
+    const linesNoWhitespace = relevantLines.map((line) => line.replace(/\s/g, ""))
+
     setCurrentLines((prev) => {
       lSystemNeedsReset.current = true; 
-      return newLines;
+      return linesNoWhitespace;
     });
-    
-  }, [setCurrentLines]);
+
+  }, [setCurrentCode, setCurrentLines])
+  
 
   const updateCurrentGFXProps = useCallback((gfxPropUpdate: GFXProps) => {
     // console.log("Gfx props updated"); 
@@ -84,9 +92,9 @@ export const LSEditor: React.FunctionComponent<LSEditorProps> = ({
         setStatus({ state: "compiled" });
       });
     } catch (e) {
-      setStatus({ state: "error", errors: [e] });
+      setStatus({ state: "error", errors: [e as Error] });
     }
-  }, []);
+  }, [setStatus]);
 
   const parseLinesAndCreateLSystem = () => {
     if (currentLines.length < 1) { 
@@ -95,7 +103,7 @@ export const LSEditor: React.FunctionComponent<LSEditorProps> = ({
       setStatus({ state: "error", errors: [ noAxiomError] })
     } else {
       
-      let errors = []; 
+      let errors: Error[] = []; 
       let status = "ready";
 
       let axiomLine = currentLines[0];
@@ -103,7 +111,7 @@ export const LSEditor: React.FunctionComponent<LSEditorProps> = ({
         parseAxiom(axiomLine);
       } catch (e) {
         status = "error"
-        errors.push(e);
+        errors.push(e as Error);
       }
       let productionLines = currentLines.slice(1);
       productionLines.forEach((productionLine) => {
@@ -111,7 +119,7 @@ export const LSEditor: React.FunctionComponent<LSEditorProps> = ({
           parseProduction(productionLine);
         } catch (e) {
           status = "error"
-          errors.push(e);
+          errors.push(e as Error);
         }
       })
       if (status === "error") {
@@ -124,14 +132,22 @@ export const LSEditor: React.FunctionComponent<LSEditorProps> = ({
     }
   }
 
+  const copyCurrentCode = useCallback( () => {
+    let copyString = window.location.origin + "/edit" + encodeParams(currentCode, gfxProps);
+    console.log("COPYING CURRENT CODE AND GFXPROPS to " + copyString, currentCode, gfxProps);
+    copy(copyString); 
+    alert("Copied");
+  }, [currentCode, gfxProps])
+
   return (
     <div>
       <div>
         <span className="clickable" onClick={() => runLS()}>
           Run LS
         </span>
+        <span className="clickable" onClick={() => copyCurrentCode()}> Share </span>
       </div>
-      <LSCodeEditor initialCode={initCode} onCodeWasEdited={updateCurrentLines} className="black-border" />
+      <LSCodeEditor initialCode={initCode} onCodeWasEdited={updateCurrentCode} className="black-border" />
       <GFXPropsCustomizer
         gfxProps={completeGfxProps(initGFXProps)}
         GFXPropsUpdated={updateCurrentGFXProps}

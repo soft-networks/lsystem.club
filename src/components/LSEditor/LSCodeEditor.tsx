@@ -1,28 +1,15 @@
 import React from "react";
 import Editor from "react-simple-code-editor";
 import { useEffect } from "react";
+import { lineIsComment, splitLines, tokenColors } from "./codeSyntax";
 
 interface CodeEditorProps {
   initialCode?: string;
   style?: React.CSSProperties
   className?: string,
-  onCodeWasEdited: (lines: string[]) => void
+  onCodeWasEdited: (code: string) => void
 }
 
-const tokenColors = {
-  comment: "gray",
-  symbol: "black",
-  letterColor: (n: number) => `hsl(${n * 20 % 360},50%,50%)`
-}
-
-const splitLines = ( rawCode: string) => {
-  return rawCode.split("\n").map((line) => line + "\n");
-}
-
-const lineIsComment = (line: string) => {
-  const lineNoWhitespace = line.replace(/\s/g, "");
-  return lineNoWhitespace[0] === "*"
-}
 
 const LSCodeEditor: React.FunctionComponent<CodeEditorProps> = ({ initialCode , style, onCodeWasEdited, className}) => {
 
@@ -47,11 +34,7 @@ const LSCodeEditor: React.FunctionComponent<CodeEditorProps> = ({ initialCode , 
 
   //TODO: Move this up into LSEditor, because its running too often right now :)
   useEffect(() => {
-    const lines = splitLines(code);
-    const relevantLines = lines.filter((line) => !lineIsComment(line) && line !== "\n");
-    const linesNoWhitespace = relevantLines.map((line) => line.replace(/\s/g, ""))
-    //console.log(lines, relevantLines);
-    onCodeWasEdited(linesNoWhitespace);
+    onCodeWasEdited(code);
   }, [onCodeWasEdited, code]);
 
   const highlightLine = (line: string, lineNumber: number): React.ReactNode => {

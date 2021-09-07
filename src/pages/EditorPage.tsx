@@ -7,16 +7,11 @@ interface PathParams {
   LSStr: string
 }
 interface PathState {
-  lsProps: LSProps,
+  initCode?: string
   gfxProps?: GFXProps,
 }
 export default class InteractiveEditor extends React.Component<RouteComponentProps<PathParams>, PathState> {
   state: PathState = {
-    lsProps: {
-      axiom: defaultLSData.axiom,
-      productions: defaultLSData.productionText,
-      iterations: defaultLSData.iterations
-    }
   }
   componentDidMount= ()=> {
     this.setStateFromURL();
@@ -27,21 +22,16 @@ export default class InteractiveEditor extends React.Component<RouteComponentPro
     }
   }
   setStateFromURL = () => {
-    let { lsProps, gfxProps } = decodeParams(this.props.location.search);
-    let newState = this.state;
-    if (lsProps) newState.lsProps = lsProps;
-    console.log("State from URL");
-    console.log(lsProps);
-    if (gfxProps) newState.gfxProps = gfxProps;
-    this.setState(newState)
+    let paramState = decodeParams(this.props.location.search);
+    console.log("SETTING STATE FROM URL", paramState);
+    this.setState(paramState)
   }
   render() {
     return (
       <div className="padded">
         <LSEditAndView
-          initLSProps={this.state.lsProps}
+          initCode={this.state.initCode}
           initGFXProps={this.state.gfxProps}
-          key={flattenLSProps(this.state.lsProps, "-")}
         />
       </div>
     );

@@ -1,5 +1,5 @@
-import p5 from "p5";
-import queryString from "query-string"
+
+import qs from "qs";
 
 
 
@@ -73,40 +73,24 @@ function cleanParam(o: string | string[]): string {
   }
   else return o as string
 }
-export function decodeParams(paramString: string): {lsProps: LSProps, gfxProps?: GFXProps} {
-  const parsed = queryString.parse(paramString);
-  let axiom = parsed.a ? cleanParam(parsed.a) : defaultLSData.axiom;
-  let iterations = parsed.i ? parseFloat(cleanParam(parsed.i)) : defaultLSData.iterations;
-  let productions = defaultLSData.productionText;
-  if (parsed.p) productions = parsed.p instanceof Array ? parsed.p : [cleanParam(parsed.p)];  
-  let gfxProps : GFXProps = {};
-  if (parsed.length || parsed.angle) {
-    if (parsed.length) gfxProps.length = parseFloat(cleanParam(parsed.length));
-    if (parsed.angle) gfxProps.angle = parseFloat(cleanParam(parsed.angle))
-    if (parsed.c0) gfxProps.center = [parseFloat(cleanParam(parsed.c0)),0];
-    if (parsed.c1) gfxProps.center = [gfxProps.center ? gfxProps.center[0] : 0, parseFloat(cleanParam(parsed.c1))];
-  }
-  return {lsProps: {axiom: axiom, iterations: iterations, productions: productions}, gfxProps: gfxProps};
+export function decodeParams(paramString: string): { initCode?: string, gfxProps?: GFXProps} {
+  const parsedDictionary = qs.parse(paramString, {ignoreQueryPrefix: true});
+  console.log("Parsed from " + paramString , parsedDictionary)
+  return {initCode: parsedDictionary.code as string, gfxProps: parsedDictionary.gfx}
 } 
 
-export function encodeParams(lsProps: Partial<LSProps>, gfxProps?: GFXProps) {
-  let axiomString = lsProps.axiom ? "a=" + encodeURIComponent(lsProps.axiom) : "a=";
-  let iterationString = lsProps.iterations ? "&i=" + encodeURIComponent(lsProps.iterations) : "";
-  let productionString = lsProps.productions ? lsProps.productions.reduce((str, p) => str + "&p=" + encodeURIComponent(p), "") : "";
-  
-  
-  let gfxPropsString = ""; 
-  if (gfxProps) {
-    if (gfxProps.length) {
-      gfxPropsString += "&length=" + encodeURIComponent(gfxProps.length);
-    }
-    if (gfxProps.angle) {
-      gfxPropsString += "&angle=" + encodeURIComponent(gfxProps.angle);
-    }
-    if(gfxProps.center) {
-      gfxPropsString += "&c0=" + encodeURIComponent(gfxProps.center[0]) + "&c1=" + encodeURIComponent(gfxProps.center[1])
-    }
-  }
-  let paramString =  "?" + axiomString + productionString + iterationString + gfxPropsString;
-  return paramString;
+export function encodeParams(code?: string, gfxProps?: GFXProps) {
+  const fullProps = { code: code, gfx: gfxProps}
+  const urlString = "?" + qs.stringify(fullProps);
+  console.log("Stringifying props into querystring" + urlString, fullProps);
+  return urlString;
+}
+
+//temp solution
+export function encodePropsParams(lsProps: LSProps, gfxProps?: GFXProps) {
+  let code = lsProps.axiom + "\n";
+  code = code + lsProps.productions.join("\n")
+
+  let gfx =  {...gfxProps || {}, iterations: lsProps.iterations};
+  return encodeParams(code, gfx);
 }

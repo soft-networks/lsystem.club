@@ -1,7 +1,7 @@
 import React from "react";
 import LSystem from "@bvk/lsystem";
 import LSCustomizer from "./LSEditor/LSCustomizer";
-import { GFXProps, LSProps } from "./utils";
+import { completeGfxProps, GFXProps, LSProps } from "./utils";
 import LSAllViewer from "./LSViewer";
 import { LSEditor } from "./LSEditor/LSEditor";
 
@@ -15,7 +15,7 @@ interface LSEditorState {
   gfxProps?: GFXProps
 }
 interface LSEditorProps {
-  initLSProps: LSProps
+  initCode?: string
   initGFXProps?: GFXProps
 }
 export default class LSEditAndView extends React.Component<LSEditorProps, LSEditorState> {
@@ -39,7 +39,9 @@ export default class LSEditAndView extends React.Component<LSEditorProps, LSEdit
             onLSReset={this.onLSReset}
             onLSIterated={this.onLSIterated}
             onGFXPropsUpdate={this.onGFXPropsUpdated}
-            initCode="AF"
+            initCode={this.props.initCode || "A\nA: A + F"}
+            initGFXProps={this.props.initGFXProps}
+            key={this.props.initCode || "default-editor"}
           />
           <LSAllViewer LSystem={this.state.LSystem} gfxProps={this.state.gfxProps} />
         </div>

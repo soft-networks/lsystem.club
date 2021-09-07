@@ -1,7 +1,7 @@
 import LSystem from "@bvk/lsystem";
 import React from "react";
 import { Link } from "react-router-dom";
-import { completeGfxProps, encodeParams, GFXProps, LSProps } from "./utils";
+import { completeGfxProps, encodeParams, encodePropsParams, GFXProps, LSProps } from "./utils";
 import VizSensor from "react-visibility-sensor";
 import { createLSInWorker } from "./worker";
 import {LSImageViewer2D, LSImageViewer3D, LSTextViewer} from "./LSViewer";
@@ -93,10 +93,7 @@ export class LSPreview extends React.Component<LSPreviewProps, LSPreviewState> {
               <div className="horizontal-stack">
                 <div className="clickable">
                   <Link
-                    to={`/edit${encodeParams(
-                      this.props.LSProps,
-                      this.props.gfxProps
-                    )}`}
+                    to={`/edit${encodePropsParams(this.props.LSProps, this.props.gfxProps)}`}
                   >
                     edit
                   </Link>
