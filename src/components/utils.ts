@@ -51,7 +51,7 @@ const defaultGFXProps: GFXPropsComplete = {
   strokeWeight: 1,
   backgroundColor:"#eee",
   animationWaitTime: 500,
-  iterations: 1
+  iterations: 3
 }
 
 export const completeGfxProps = (gfxProps: GFXProps | undefined) : GFXPropsComplete => {
@@ -75,14 +75,14 @@ function cleanParam(o: string | string[]): string {
 }
 export function decodeParams(paramString: string): { initCode?: string, gfxProps?: GFXProps} {
   const parsedDictionary = qs.parse(paramString, {ignoreQueryPrefix: true});
-  console.log("Parsed from " + paramString , parsedDictionary)
+  //console.log("Parsed from " + paramString , parsedDictionary)
   return {initCode: parsedDictionary.code as string, gfxProps: parsedDictionary.gfx}
 } 
 
 export function encodeParams(code?: string, gfxProps?: GFXProps) {
   const fullProps = { code: code, gfx: gfxProps}
   const urlString = "?" + qs.stringify(fullProps);
-  console.log("Stringifying props into querystring" + urlString, fullProps);
+  //console.log("Stringifying props into querystring" + urlString, fullProps);
   return urlString;
 }
 
@@ -93,4 +93,15 @@ export function encodePropsParams(lsProps: LSProps, gfxProps?: GFXProps) {
 
   let gfx =  {...gfxProps || {}, iterations: lsProps.iterations};
   return encodeParams(code, gfx);
+}
+
+export function createFave(code?: string, gfxProps?: GFXProps) {
+  return {code: code, gfx: gfxProps};
+}
+
+export function getFave(fave: any) {
+  if (fave && fave.code) {
+    return {code: fave.code, gfx: fave.gfx}
+  }
+  return undefined;
 }

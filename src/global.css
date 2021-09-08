@@ -19,6 +19,9 @@ em {
 .blue {
   color: blue;
 }
+.grey {
+  color: gray;
+}
 .full-bleed {
   width: 100vw;
   height: 100vh;

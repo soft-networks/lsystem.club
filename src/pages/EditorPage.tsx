@@ -3,6 +3,7 @@ import { decodeParams, GFXProps, LSProps, defaultLSData, flattenLSProps} from ".
 import { RouteComponentProps } from "react-router-dom";
 import LSEditAndView from "../components/LSEditAndView";
 
+
 interface PathParams {
   LSStr: string
 }
@@ -17,14 +18,15 @@ export default class InteractiveEditor extends React.Component<RouteComponentPro
     this.setStateFromURL();
   }
   componentDidUpdate = (prevProps: RouteComponentProps<PathParams>) => {
-    if(this.props.location.search !== prevProps.location.search) {
+    if(this.props.location.search !== prevProps.location.search && this.props.location.search !== "") {
       this.setStateFromURL();
     }
   }
   setStateFromURL = () => {
     let paramState = decodeParams(this.props.location.search);
-    console.log("SETTING STATE FROM URL", paramState);
+    //console.log("SETTING STATE FROM URL", paramState);
     this.setState(paramState)
+    this.props.history.replace("/edit");
   }
   render() {
     return (
@@ -32,6 +34,7 @@ export default class InteractiveEditor extends React.Component<RouteComponentPro
         <LSEditAndView
           initCode={this.state.initCode}
           initGFXProps={this.state.gfxProps}
+          saveToLocalStorage={"editorPage"}
         />
       </div>
     );

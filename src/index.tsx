@@ -7,6 +7,7 @@ import InteractiveEditor from './pages/EditorPage';
 import Lilac from './pages/Examples/Lilac';
 import textGarden from './pages/Examples/TextGarden';
 import WebPage from './pages/Examples/Webpage';
+import FavoritePage from './pages/FavoritePage';
 
 ReactDOM.render(
   <Router>
@@ -15,6 +16,7 @@ ReactDOM.render(
     <Route exact path="/examples/Lilac" component={Lilac} />
     <Route exact path="/examples/Text" component={textGarden} />
     <Route exact path="/examples/WWW" component={WebPage} />
+    <Route exact path="/favorites" component={FavoritePage} />
   </Router>,
   document.getElementById('root')
 );

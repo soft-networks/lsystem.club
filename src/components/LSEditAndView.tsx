@@ -13,10 +13,12 @@ import { LSEditor } from "./LSEditor/LSEditor";
 interface LSEditorState {
   LSystem: LSystem | undefined,
   gfxProps?: GFXProps
+  
 }
 interface LSEditorProps {
   initCode?: string
   initGFXProps?: GFXProps
+  saveToLocalStorage?: string
 }
 export default class LSEditAndView extends React.Component<LSEditorProps, LSEditorState> {
   state: LSEditorState = {
@@ -39,9 +41,10 @@ export default class LSEditAndView extends React.Component<LSEditorProps, LSEdit
             onLSReset={this.onLSReset}
             onLSIterated={this.onLSIterated}
             onGFXPropsUpdate={this.onGFXPropsUpdated}
-            initCode={this.props.initCode || "A\nA: A + F"}
+            initCode={this.props.initCode}
             initGFXProps={this.props.initGFXProps}
             key={this.props.initCode || "default-editor"}
+            saveToLocalStorage={this.props.saveToLocalStorage}
           />
           <LSAllViewer LSystem={this.state.LSystem} gfxProps={this.state.gfxProps} />
         </div>

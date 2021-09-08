@@ -7,7 +7,7 @@ interface CodeEditorProps {
   initialCode?: string;
   style?: React.CSSProperties
   className?: string,
-  onCodeWasEdited: (code: string) => void
+  onCodeWasEdited: (code: string) => void,
 }
 
 

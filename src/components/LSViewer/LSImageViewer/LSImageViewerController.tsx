@@ -53,7 +53,7 @@ const LSImageViewerController : React.FunctionComponent<LSImageViewerControllerP
     if (activeInterval.current) clearTimeout(activeInterval.current);
     setCurrentIteration(props.lSystem.iterations);
     setAllCurrentAxioms(props.lSystem.getAllIterationsAsObject())
-  }, [ props.lSystem])
+  }, [ props.lSystem, props.lSystem.iterations])
 
   //When the currentIteration or all current Axioms change, change current axiom (trigger-re-render)
   useEffect( () => {
@@ -90,7 +90,8 @@ const LSImageViewerController : React.FunctionComponent<LSImageViewerControllerP
       activeInterval.current = setTimeout(() => setCurrentIteration(currentIteration +1), props.gfxProps?.animationWaitTime || completeGfxProps(undefined).animationWaitTime);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentIteration, props.lSystem.iterations])
+  }, [currentIteration])
+
 
 
   return (
