@@ -2,6 +2,7 @@ import React from "react"
 import {  GFXPropsComplete, P5CanvasType } from "../../utils";
 import {Axiom} from "@bvk/lsystem"
 import p5 from "p5";
+import ReactScrollWheelHandler from "react-scroll-wheel-handler";
 
 //Props should control all the things coming into the viewer
 export interface LSImageViewerBasicProps {
@@ -11,7 +12,8 @@ export interface LSImageViewerBasicProps {
 
 //State should control anything needed for the panning + zooming 
 export interface LSImageViewerBasicState {
-
+  localScale: number,
+  localCenter: number[] 
 }
 
 
@@ -26,14 +28,18 @@ export default class LSImageViewerBasic extends React.Component<LSImageViewerBas
     super(props);
     //TODO: When to bind
     this.state = {
-
+      localScale: 1,
+      localCenter: props.gfxProps.center
     }
   }
   componentDidMount() {
     if (this.containerRef.current) 
       new p5(this.sketch, this.containerRef.current);
   }
-  componentDidUpdate() {
+  componentDidUpdate(prevProps: LSImageViewerBasicProps) {
+    if (this.props.gfxProps.center !== prevProps.gfxProps.center) {
+      this.setState({localCenter: this.props.gfxProps.center})
+    }
     this.redraw();
   }
 
@@ -65,13 +71,18 @@ export default class LSImageViewerBasic extends React.Component<LSImageViewerBas
     if (!p) return
     p.translate(p.width / 2, p.height / 2);
   }
+  scaleToZoomLevel = (p: p5) => {
+    if (!p) return;
+    p.scale(this.state.localScale);
+  }
   rotateToUp = (p : p5) => {
     if (p) p.rotate(-90);
   }
   drawCurrentGraphic = (p:p5) => {
     p.push();
     this.moveToCanvasCenter(p);
-    p.translate(this.props.gfxProps.center[0] * p.width, this.props.gfxProps.center[1] * p.height);
+    this.scaleToZoomLevel(p);
+    p.translate(this.state.localCenter[0] * p.width, this.state.localCenter[1] * p.height);
     this.rotateToUp(p);
     this.drawCurrentAxiom(p);
     p.pop();
@@ -95,9 +106,58 @@ export default class LSImageViewerBasic extends React.Component<LSImageViewerBas
 
     }
   };
+  handleZoom = (zoomAmount: number) => {
+    if (zoomAmount && zoomAmount !== 0) {
+      let scale = this.state.localScale;
+      let amtChange = 1;
+      scale = zoomAmount > 0 ? scale + amtChange  : Math.max(scale - amtChange, 0.1);
+      console.log("Setting new scale" + scale);
+      this.setState({localScale: scale})
+    }
+  }
+  handlePan = (panX: number, panY: number) => {
+    let center = this.state.localCenter;
+    center = [center[0] + panX, center[1] + panY];
+    this.setState({localCenter: center})
+  }
+  getZoomControls = () => {
+    return (
+      <div key="zoom-controls">
+        <div className="clickable" onClick={(e) => this.handleZoom(+1)}>
+          +
+        </div>
+        <div className="clickable" onClick={(e) => this.handleZoom(-1)}>
+          -
+        </div>
+      </div>);
+  }
+  getPanControls = () => {
+    return ( <div key="pan-controls">
+      <div className="clickable" onClick={(e) => this.handlePan(0, -0.01)}>
+        up
+      </div>
+      <div className="clickable" onClick={(e) => this.handlePan(0, 0.01)}>
+        dw
+      </div>
+      <div className="clickable" onClick={(e) => this.handlePan(-0.01, 0)}>
+        lf
+      </div>
+      <div className="clickable" onClick={(e) => this.handlePan(0.01, 0)}>
+        rt
+      </div>
+    </div>)
+  }
+  getCanvasControls = (): JSX.Element[] => {
+    return [ this.getZoomControls(), this.getPanControls()];
+  }
   render() {
     return (
-          <div ref={this.containerRef} />
+      <div style={{ position: "relative" }}>
+        <div style={{ position: "absolute", right: 0, top: 0, zIndex: 2 }} className="padded" >
+          {this.getCanvasControls()}
+        </div>
+        <div ref={this.containerRef} />
+      </div>
     );
   }
 }

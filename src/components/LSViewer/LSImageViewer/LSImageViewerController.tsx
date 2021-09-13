@@ -1,10 +1,9 @@
 import React, {useCallback, useRef, useState} from "react";
 import LSystem, { Axiom } from "@bvk/lsystem";
-import { completeGfxProps, GFXProps, P5CanvasType, renderTypes } from "../../utils";
+import { completeGfxProps, GFXProps } from "../../utils";
 import LSImageViewer2D from "./LSImageViewer2D";
 import LSImageViewer3D from "./LSImageViewer3D";
 import { useEffect } from "react";
-import { createImportSpecifier } from "typescript";
 
 
 interface LSImageViewerControllerProps {
@@ -16,27 +15,44 @@ interface LSImageViewerControllerProps {
 
 type ImageRenderTypes = "2d" | "3d";
 
-
-const getViewerType = (lSystem: LSystem, gfxProps?: GFXProps) : ImageRenderTypes => {
-  if (gfxProps && gfxProps.renderType) {
+function charIs3D(l: string) {
+  return l === "&" || l === "^" || l === "/" || l === "\\"
+}
+function getViewerType(lSystem: LSystem, gfxProps?: GFXProps) : ImageRenderTypes {
+  if (gfxProps && gfxProps.renderType && ! gfxProps.renderType.includes("auto")) {
     if (gfxProps.renderType.includes("2d")) 
       return "2d"
     if (gfxProps.renderType.includes("3d")) 
       return "3d"
   }
-  let iterationString = lSystem.getIterationAsString();
-  if (iterationString.match(`.*[&^\\\/].*`)) {
-    console.log("Is 3d");
-    return "3d";
-  } else {
-    return "2d"
-  }
+  lSystem.axiom.forEach((l) => {
+    if (charIs3D(l.symbol)) {
+      return "3d"
+    }
+  })
+  lSystem.productions.forEach((p) => {
+   let successors = Array.isArray(p.successor) ? p.successor : [p.successor];
+    successors.forEach( (s) => {
+      s.letters.forEach((l) => {
+        if (charIs3D(l.symbol))
+        return "3d"
+      })
+    })
+  })
+  return "2d"  
 }
+
+/**
+ * Component to manage viewing an LSystem as an image.
+ * NOTE: IF the Lsystem has not been "iterated", this component will iterate it on the main thread. It is recommended to iterate before initializing component
+ * @param props 
+ * @returns 
+ */
 const LSImageViewerController : React.FunctionComponent<LSImageViewerControllerProps> = (props) => {
 
   const [viewerType, setViewerType] = useState<ImageRenderTypes>( getViewerType(props.lSystem, props.gfxProps));
-  const [currentAxiom, setCurrentAxiom] = useState<Axiom>(props.lSystem.getIterationAsObject())
-  const [allCurrentAxioms, setAllCurrentAxioms] = useState<Axiom[]>(props.lSystem.getAllIterationsAsObject())
+  const [currentAxiom, setCurrentAxiom] = useState<Axiom>();
+  const [allCurrentAxioms, setAllCurrentAxioms] = useState<Axiom[]>();
   const [currentIteration, setCurrentIteration] = useState<number>(props.lSystem.iterations);
 
   const currentlyAnimating = useRef<boolean>(false);
@@ -44,12 +60,19 @@ const LSImageViewerController : React.FunctionComponent<LSImageViewerControllerP
 
   //Trigger re-render if the gxfProps, current axiom, or viewer type change
   const getViewer = useCallback(() => {
-    const viewerProps = { gfxProps: completeGfxProps(props.gfxProps), axiom: currentAxiom}
-    return viewerType === "3d" ? <LSImageViewer2D {...viewerProps} />: <LSImageViewer3D {...viewerProps} />
+    if (currentAxiom) {
+      const viewerProps = { gfxProps: completeGfxProps(props.gfxProps), axiom: currentAxiom };
+      return viewerType === "2d" ? (
+        <LSImageViewer2D {...viewerProps} key="controller-viewer-2d" />
+      ) : (
+        <LSImageViewer3D {...viewerProps} key="controller-viewer-3d" />
+      );
+    }
   }, [ props.gfxProps, currentAxiom, viewerType])
 
   //When the lsystem changes, cancel any anim timers and set current iterations + all current axioms
   useEffect( () => {
+    console.log("🏠🏠 i am alive")
     if (activeInterval.current) clearTimeout(activeInterval.current);
     setCurrentIteration(props.lSystem.iterations);
     setAllCurrentAxioms(props.lSystem.getAllIterationsAsObject())
@@ -57,14 +80,16 @@ const LSImageViewerController : React.FunctionComponent<LSImageViewerControllerP
 
   //When the currentIteration or all current Axioms change, change current axiom (trigger-re-render)
   useEffect( () => {
-    console.log("Changing axiom... should re-render")
-    setCurrentAxiom(allCurrentAxioms[currentIteration]);
+    console.log("🏠🏠🏠🏠🏠🏠🏠🏠🏠🏠 Changing axiom... should re-render")
+    if (allCurrentAxioms)
+      setCurrentAxiom(allCurrentAxioms[currentIteration]);
   }, [currentIteration, allCurrentAxioms])
 
   //If ls or gfx props change, viewer type may change
   useEffect(() => {
-    const newViewerType = getViewerType(props.lSystem, props.gfxProps);
-    setViewerType(newViewerType);
+    console.log("Changing LSystem or GFX props, should guess viewer type")
+    // const newViewerType = getViewerType(props.lSystem, props.gfxProps) ;
+    setViewerType(getViewerType(props.lSystem, props.gfxProps));
   }, [props.lSystem, props.gfxProps])
 
 
@@ -108,14 +133,3 @@ const LSImageViewerController : React.FunctionComponent<LSImageViewerControllerP
 }
 
 export default LSImageViewerController
-// const viewerType = getViewerType(props.lSystem, props.gfxProps)
-// const viewerProps = { gfxProps: completeGfxProps(props.gfxProps) , axiom: props.lSystem.getIterationAsObject()}
-
-// return (
-//   <div>
-//     viewer: {viewerType}
-//     iterations: { props.lSystem.iterations}
-//     {viewerType === "3d" ? <LSImageViewer3D {...viewerProps} /> : <LSImageViewer2D {...viewerProps}/>  }
-
-//   </div>
-// )

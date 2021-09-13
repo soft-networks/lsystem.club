@@ -10,7 +10,7 @@ export const defaultLSData = {
 }
 
 export type P5CanvasType = "webgl" | "p2d"
-export type renderTypes = "2d" | "3d" | "text" | "pixel";
+export type renderTypes = "auto"  | "2d" | "3d" | "text" | "pixel";
 
 export interface CompleteLSExample {
   lsProps: LSProps
@@ -42,7 +42,7 @@ export interface GFXPropsComplete {
 }
 
 const defaultGFXProps: GFXPropsComplete = {
-  renderType: ["2d"],
+  renderType: ["auto"],
   length: 10,
   angle: 30,
   center: [0,0],
@@ -104,4 +104,8 @@ export function getFave(fave: any) {
     return {code: fave.code, gfx: fave.gfx}
   }
   return undefined;
+}
+
+export function propsToCode(lsProps: LSProps) : string  {
+  return lsProps.axiom + "\n" + lsProps.productions.join("\n");
 }

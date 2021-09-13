@@ -6,10 +6,11 @@ import { LSProps } from "../utils";
 
 
 export const createLSInWorker = async (lSystemProps: LSProps): Promise<LSystem> => {
-  console.log("Creating new worker with props", lSystemProps);
+  console.log("🐸🐸🐸🐸🐸 Creating new worker with props", lSystemProps);
   const instance = new Worker();
   const newLS = new LSystem(lSystemProps.axiom, lSystemProps.productions, lSystemProps.iterations);
   const allIterations : Axiom[] = await instance.createLSOffThread(lSystemProps);
+  console.log("🐸🐸🐸🐸🐸 ITERATION WITHIN THE WORKER IS COMPLETE", allIterations);
   newLS.outputs = allIterations;
   return newLS
 }
