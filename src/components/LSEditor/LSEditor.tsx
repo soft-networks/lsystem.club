@@ -19,7 +19,8 @@ interface LSEditorProps {
   onGFXPropsUpdate(gfxProps: GFXProps): void;
   initCode?: string
   initGFXProps?: GFXProps
-  saveToLocalStorage?: string
+  saveToLocalStorage?: string,
+  className?: string
 }
 
 const defaultCode = "* Simple Spiral \n\n* Axiom: Start with A A\nA\n\n* Production: A becomes: F (forward), + (turn), A (repeat)\nA:F+A"
@@ -30,7 +31,8 @@ export const LSEditor: React.FunctionComponent<LSEditorProps> = ({
   onGFXPropsUpdate,
   initCode,
   initGFXProps,
-  saveToLocalStorage
+  saveToLocalStorage,
+  className
 }) => {
   const [lSystem, setLSystem] = useState<LSystem>();
   const [status, setStatus] = useState<LSStatus>();
@@ -181,25 +183,21 @@ export const LSEditor: React.FunctionComponent<LSEditorProps> = ({
   }, [currentCode, gfxProps]); 
 
   return (
-    <div style={{display: "flex", flexDirection: "column"}}>
-      <div className="stack" style={{flex: 2}}>
-        <div>
-          <span className="clickable" onClick={() => runLS()}>
-            Run LS
-          </span>
-          <span className="clickable" onClick={() => copyCurrentCode()}>
-            Share
-          </span>
-          <span className="clickable" onClick={() => saveCurrentCodeLocally()}>
-            Save to favorites
-          </span>
-        </div>
-        <LSCodeEditor initialCode={currentCode} onCodeWasEdited={updateCurrentCode} className="black-border" />
-        <GFXPropsCustomizer gfxProps={completeGfxProps(initGFXProps)} GFXPropsUpdated={updateCurrentGFXProps} />
+    <div className={`stack no-gap ${className}`}>
+      <div className="horizontal-stack edit-surface toolbar border-bottom">
+        <span className="clickable" onClick={() => runLS()}>
+          Run LS
+        </span>
+        <span className="clickable" onClick={() => copyCurrentCode()}>
+          Share
+        </span>
+        <span className="clickable" onClick={() => saveCurrentCodeLocally()}>
+          Save to favorites
+        </span>
       </div>
-      <div style={{flex: 2, backgroundColor: "#eee"}} className="padded">
-        <LSConsole status={status} />
-      </div>
+      <LSCodeEditor style={{flex: 2}} initialCode={currentCode} onCodeWasEdited={updateCurrentCode} className="edit-surface-light-tone border-bottom padded"/>
+      <GFXPropsCustomizer gfxProps={completeGfxProps(initGFXProps)} GFXPropsUpdated={updateCurrentGFXProps} className="edit-surface-light-tone border-bottom padded" />
+      <LSConsole status={status} className={"edit-surface-gray-tone padded console-height"} />
     </div>
   );
 };

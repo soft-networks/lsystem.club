@@ -36,7 +36,7 @@ export default class LSEditAndView extends React.Component<LSEditorProps, LSEdit
   }
   render() {
       return (
-        <div className="side-by-side">
+        <div className="side-by-side" style={{height: "100%"}}>
           <LSEditor
             onLSReset={this.onLSReset}
             onLSIterated={this.onLSIterated}
@@ -45,6 +45,7 @@ export default class LSEditAndView extends React.Component<LSEditorProps, LSEdit
             initGFXProps={this.props.initGFXProps}
             key={this.props.initCode || "default-editor"}
             saveToLocalStorage={this.props.saveToLocalStorage}
+            className="border-right"
           />
           <LSAllViewer LSystem={this.state.LSystem} gfxProps={this.state.gfxProps} />
         </div>

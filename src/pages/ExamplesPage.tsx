@@ -1,26 +1,21 @@
 import LSEditAndView from "../components/LSEditAndView";
 import { LSPreview } from "../components/LSPreview";
+import PageLayout from "../components/PageLayout";
 import { CompleteLSExample } from "../components/utils";
 import Worker from "../components/worker/index";
 
-export default function Examples(): JSX.Element {
-  let doThing = async () => {
-    console.log("Clicked");
-    const instance = new Worker();
-    await instance.processData("Whatever").then((output) => {
-      console.log(output);
-    });
-  };
+const Examples: React.FunctionComponent = ({}) => {
   return (
-    <div className="padded" onClick={() => doThing()}>
-      {staticExamples()}
-    </div>
+    <PageLayout>
+        <StaticExamples/>
+    </PageLayout>
   );
 }
+export default Examples;
 
 //staticExamples.js
 
-function staticExamples() {
+const StaticExamples: React.FunctionComponent = ({}) => {
   const examples: CompleteLSExample[] = [
     {
       name: "Text example",

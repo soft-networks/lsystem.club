@@ -2,7 +2,8 @@ import { LSStatus } from "../utils";
 import React, {useState, useEffect} from "react"
 
 interface LSConsoleProps {
-  status?: LSStatus
+  status?: LSStatus,
+  className?: string
 }
 
 interface StatusLog {
@@ -10,7 +11,7 @@ interface StatusLog {
   status: LSStatus
 }
 
-const LSConsole : React.FunctionComponent<LSConsoleProps> = ( {status}) => {
+const LSConsole : React.FunctionComponent<LSConsoleProps> = ( {status, className}) => {
   
   const [ statusLog, setStatusLog] = useState<StatusLog[]>([]);
   //const [ currentStatus, setCurrentStatus] = useState<JSX.Element>( statusToEl(status));
@@ -23,7 +24,7 @@ const LSConsole : React.FunctionComponent<LSConsoleProps> = ( {status}) => {
     }
   }, [status])
 
-  return <div> {statusLog.map((logStatus) => statusToEl(logStatus.status, logStatus.timecode) )} </div>
+  return <div className={className}> {statusLog.map((logStatus) => statusToEl(logStatus.status, logStatus.timecode) )} </div>
 }
 
 const statusToEl = (status: LSStatus | undefined, timecode?: string) : JSX.Element => {
@@ -50,7 +51,7 @@ const statusToEl = (status: LSStatus | undefined, timecode?: string) : JSX.Eleme
       break;
   }}
   let timecodeEl = timecode ? <span className="grey"> {timecode} </span> : "";
-  return <div> {timecodeEl} {stringEl} </div>
+  return <div > {timecodeEl} {stringEl} </div>
 }
 
 

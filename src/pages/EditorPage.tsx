@@ -1,7 +1,8 @@
 import React from "react"
-import { decodeParams, GFXProps, LSProps, defaultLSData, flattenLSProps} from "../components/utils"
+import { decodeParams, GFXProps} from "../components/utils"
 import { RouteComponentProps } from "react-router-dom";
 import LSEditAndView from "../components/LSEditAndView";
+import PageLayout from "../components/PageLayout";
 
 
 interface PathParams {
@@ -30,13 +31,13 @@ export default class InteractiveEditor extends React.Component<RouteComponentPro
   }
   render() {
     return (
-      <div className="padded">
+      <PageLayout>
         <LSEditAndView
           initCode={this.state.initCode}
           initGFXProps={this.state.gfxProps}
           saveToLocalStorage={"editorPage"}
         />
-      </div>
+      </PageLayout>
     );
   }
 }

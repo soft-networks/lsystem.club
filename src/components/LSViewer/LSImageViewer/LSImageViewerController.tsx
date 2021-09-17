@@ -120,13 +120,16 @@ const LSImageViewerController : React.FunctionComponent<LSImageViewerControllerP
 
 
   return (
-    <div>
-      viewer: {viewerType} , iterations: {currentIteration}, animate:
+    <div className="stack">
+      <div className="toolbar horizontal-stack edit-surface border-bottom">
+      <span> viewer: {viewerType}  </span> 
+      <span> iterations: {currentIteration} </span>
       {currentlyAnimating.current === true ? (
         <span onClick={() => stopIterationAnimation()} className="clickable"> stop </span>
       ) : (
         <span onClick={() => startIterationAnimation()} className="clickable"> start </span>
       )}
+      </div>
       {getViewer()}
     </div>
   );

@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
+import PageLayout from "../components/PageLayout";
 import { encodeParams, getFave } from "../components/utils";
 
-const FavoritePage = () => {
+const FavoritePage: React.FunctionComponent = ({}) => {
 
   const favorites = localStorage.getItem("favorites");
   if (! favorites || favorites === "") {
-    return <div> No favorites yet </div>
+    return <PageLayout><div> No favorites yet </div></PageLayout>
   }
 
   const faveList = JSON.parse(favorites);
@@ -17,7 +18,7 @@ const FavoritePage = () => {
       return <li> Fave corrupted, sorry </li>
     }
   })
-  return <ul> {links} </ul> 
+  return (<PageLayout><ul> {links} </ul> </PageLayout>)
 }
 
 export default FavoritePage;

@@ -10,6 +10,7 @@ export const tokenColors = {
 }
 
 export const splitLines = ( rawCode: string) => {
+  if (! rawCode) { console.error("Somehow tried instatintiang with null code"); return [""]}
   return rawCode.split("\n").map((line) => line + "\n");
 }
 
