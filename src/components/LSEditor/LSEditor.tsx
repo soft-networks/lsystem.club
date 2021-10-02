@@ -1,43 +1,49 @@
-
-
-import LSystem, {  parseAxiom, parseProduction } from "@bvk/lsystem"
-import React, { useCallback, useState } from "react"
+import LSystem, { parseAxiom, parseProduction } from "@bvk/lsystem";
+import React, { useCallback, useState } from "react";
 import { useEffect } from "react";
-import {completeGfxProps, createFave, decodeParams, encodeParams, GFXProps, GFXPropsComplete, LSProps, LSStatus} from "../utils"
+import {
+  completeGfxProps,
+  createFave,
+  encodeParams,
+  GFXProps,
+  GFXPropsComplete,
+  LSError,
+  LSStatus,
+} from "../utils";
 import { createLSInWorker } from "../worker";
 import LSConsole from "./LSStatusConsole";
 import LSCodeEditor from "./LSCodeEditor";
 import { GFXPropsCustomizer } from "./LSGFXEditor";
 import { useRef } from "react";
 import { lineIsComment, splitLines } from "./codeSyntax";
-import copy from "copy-to-clipboard"
-import base64 from "base-64";
+import copy from "copy-to-clipboard";
 
 interface LSEditorProps {
   onLSReset(LS: LSystem): void;
   onLSIterated(LS: LSystem): void;
   onGFXPropsUpdate(gfxProps: GFXProps): void;
-  initCode?: string
-  initGFXProps?: GFXProps
-  saveToLocalStorage?: string,
-  className?: string
+  initCode?: string;
+  initGFXProps?: GFXProps;
+  saveToLocalStorage?: string;
+  className?: string;
 }
 
-const defaultCode = "* Simple Spiral \n\n* Axiom: Start with A A\nA\n\n* Production: A becomes: F (forward), + (turn), A (repeat)\nA:F+A"
+const defaultCode =
+  "* Simple Spiral \n\n* Axiom: Start with A A\nA\n\n* Production: A becomes: F (forward), + (turn), A (repeat)\nA:F+A";
 
 export const LSEditor: React.FunctionComponent<LSEditorProps> = ({
   onLSReset,
-  onLSIterated,
   onGFXPropsUpdate,
   initCode,
   initGFXProps,
   saveToLocalStorage,
-  className
+  className,
 }) => {
   const [lSystem, setLSystem] = useState<LSystem>();
   const [status, setStatus] = useState<LSStatus>();
   const [gfxProps, setGFXProps] = useState<GFXPropsComplete>(completeGfxProps(initGFXProps));
   const firstRun = useRef<boolean>(true);
+  const isMounted = useRef<boolean>(false);
   const initializeCode = (): string => {
     if (initCode !== undefined) return initCode;
     if (saveToLocalStorage !== undefined) {
@@ -46,103 +52,108 @@ export const LSEditor: React.FunctionComponent<LSEditorProps> = ({
         return storedVal as string;
       }
     }
-    return defaultCode
+    return defaultCode;
   };
   const [currentCode, setCurrentCode] = useState<string>(initializeCode);
-
-
-
   const lSystemNeedsReset = useRef<boolean>(true);
   const gfxPropsNeedsReset = useRef<boolean>(true);
 
-
   useEffect(() => {
-    if (lSystem)
-      onLSReset(lSystem);
-  }, [lSystem, onLSReset])
-
-
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
+  useEffect(() => {
+    if (lSystem) onLSReset(lSystem);
+  }, [lSystem, onLSReset]);
 
   //TODO: Move line login into refresh function to optimize
-
 
   useEffect(() => {
     if (saveToLocalStorage && currentCode !== undefined) {
       //console.log("Local storage key exists setting", currentCode);
       localStorage.setItem(saveToLocalStorage, currentCode);
     }
-  }, [currentCode, saveToLocalStorage])
-  
+  }, [currentCode, saveToLocalStorage]);
 
-  const createLSystem = useCallback((lsProps) => {
-    // console.log("Gonna run current LS");
-    try {
-      setStatus({ state: "compiling" });
-      createLSInWorker(lsProps).then((updatedLS) => {
-        setLSystem(updatedLS);
-        setStatus({ state: "compiled" });
+  const createLSystem = useCallback(
+    (lsProps) => {
+      // console.log("Gonna run current LS");
+      
+        setStatus({ state: "compiling" });
+        createLSInWorker(lsProps).then((updatedLS) => {
+          if (isMounted.current) {
+            setLSystem(updatedLS);
+            setStatus({ state: "compiled" });
+          }
+        }).catch((e) => {
+          console.log(e);
+          setStatus({ state: "error", errors: [{lineNum: "global", error: e as Error}] });  
+        });
+    },
+    [setStatus]
+  );
+
+  const updateCurrentGFXProps = useCallback(
+    (gfxPropUpdate: GFXProps) => {
+      // console.log("Gfx props updated");
+      setGFXProps((prevProps) => {
+        if (gfxPropUpdate.iterations !== undefined && gfxPropUpdate.iterations !== prevProps.iterations) {
+          lSystemNeedsReset.current = true;
+        } else {
+          gfxPropsNeedsReset.current = true;
+        }
+        return { ...prevProps, ...gfxPropUpdate };
       });
-    } catch (e) {
-      setStatus({ state: "error", errors: [e as Error] });
-    }
-  }, [setStatus]);
-
-
-
-  const updateCurrentGFXProps = useCallback((gfxPropUpdate: GFXProps) => {
-    // console.log("Gfx props updated"); 
-    setGFXProps((prevProps) => {
-      if (gfxPropUpdate.iterations !== undefined && gfxPropUpdate.iterations !== prevProps.iterations) {
-        lSystemNeedsReset.current = true;
-      } else {
-        gfxPropsNeedsReset.current = true;
-      }
-      return {...prevProps, ...gfxPropUpdate}
-    })
-  }, [setGFXProps])
+    },
+    [setGFXProps]
+  );
 
   const parseLinesAndCreateLSystem = useCallback(() => {
-      
     let lines = splitLines(currentCode);
-    const relevantLines = lines.filter((line) => !lineIsComment(line) && line !== "\n");
-    const linesNoWhitespace = relevantLines.map((line) => line.replace(/\s/g, ""))
-    const currentLines = linesNoWhitespace;
 
-    if (currentLines.length < 1) { 
+    const relevantLinesWithNumbers : {l: string, n: number}[] = [];
+    lines.forEach((line, lineNum) => {
+      if (!lineIsComment(line) && line && line.trim() !== "") {
+        relevantLinesWithNumbers.push({l: line, n: lineNum});
+      }
+    })
+
+    const currentLines = relevantLinesWithNumbers;
+    if (currentLines.length < 1) {
       console.log(currentLines);
-      const noAxiomError = new Error("An LSystem needs at least one axiom"); 
-      setStatus({ state: "error", errors: [ noAxiomError] })
+      const noAxiomError = new Error("An LSystem needs at least one axiom");
+      setStatus({ state: "error", errors: [{lineNum: 0, error: noAxiomError}] });
     } else {
-      
-      let errors: Error[] = []; 
+      let errors: LSError[] = [];
       let status = "ready";
-
       let axiomLine = currentLines[0];
       try {
-        parseAxiom(axiomLine);
+        parseAxiom(axiomLine.l);
       } catch (e) {
-        status = "error"
-        errors.push(e as Error);
+        status = "error";
+        errors.push({lineNum: axiomLine.n, error: e as Error});
       }
       let productionLines = currentLines.slice(1);
-      productionLines.forEach((productionLine) => {
+      productionLines.forEach((productionLine, i) => {
         try {
-          parseProduction(productionLine);
+          parseProduction(productionLine.l);
         } catch (e) {
-          status = "error"
-          errors.push(e as Error);
+          status = "error";
+          errors.push({lineNum: productionLine.n, error: e as Error});
         }
-      })
+      });
       if (status === "error") {
-        setStatus({state: status, errors: errors })
+        setStatus({ state: status, errors: errors });
       } else {
         // @ts-ignore: Ignoring let error.
-        setStatus({state: "ready"});
-        createLSystem({axiom: axiomLine, productions: productionLines, iterations: gfxProps.iterations}); 
+        setStatus({ state: "ready" });
+        createLSystem({ axiom: axiomLine.l, productions: productionLines.map((p) => p.l), iterations: gfxProps.iterations });
       }
     }
-  }, [createLSystem, currentCode, gfxProps.iterations])
-  
+  }, [createLSystem, currentCode, gfxProps.iterations]);
+
   const runLS = useCallback(() => {
     // console.log("Time to run L-System");
     if (lSystemNeedsReset.current) {
@@ -155,32 +166,33 @@ export const LSEditor: React.FunctionComponent<LSEditorProps> = ({
       onGFXPropsUpdate(gfxProps);
       gfxPropsNeedsReset.current = false;
     }
-  }, [gfxProps, onGFXPropsUpdate, parseLinesAndCreateLSystem])
+  }, [gfxProps, onGFXPropsUpdate, parseLinesAndCreateLSystem]);
 
-  const updateCurrentCode = useCallback((newCode: string) => {
-    setCurrentCode(newCode);
-    lSystemNeedsReset.current = true; 
-    if (firstRun.current) {
-      firstRun.current = false;
-      runLS();
-    }
-  }, [setCurrentCode, runLS])
+  const updateCurrentCode = useCallback(
+    (newCode: string) => {
+      setCurrentCode(newCode);
+      lSystemNeedsReset.current = true;
+      if (firstRun.current) {
+        firstRun.current = false;
+        runLS();
+      }
+    },
+    [setCurrentCode, runLS]
+  );
 
-
-
-  const copyCurrentCode = useCallback( () => {
+  const copyCurrentCode = useCallback(() => {
     let copyString = window.location.origin + "/edit" + encodeParams(currentCode, gfxProps);
     //console.log("COPYING CURRENT CODE AND GFXPROPS to " + copyString, currentCode, gfxProps);
-    copy(copyString); 
+    copy(copyString);
     alert("Copied");
-  }, [currentCode, gfxProps])
+  }, [currentCode, gfxProps]);
 
   const saveCurrentCodeLocally = useCallback(() => {
     const currentFavoriteString = localStorage.getItem("favorites");
     const currentFavorites = currentFavoriteString ? JSON.parse(currentFavoriteString) : {};
-    currentFavorites[Date.now() + ''] = createFave(currentCode, gfxProps);
+    currentFavorites[Date.now() + ""] = createFave(currentCode, gfxProps);
     localStorage.setItem("favorites", JSON.stringify(currentFavorites));
-  }, [currentCode, gfxProps]); 
+  }, [currentCode, gfxProps]);
 
   return (
     <div className={`stack no-gap ${className}`}>
@@ -195,9 +207,21 @@ export const LSEditor: React.FunctionComponent<LSEditorProps> = ({
           Save to favorites
         </span>
       </div>
-      <LSCodeEditor style={{flex: 2}} initialCode={currentCode} onCodeWasEdited={updateCurrentCode} className="edit-surface-light-tone border-bottom padded"/>
-      <GFXPropsCustomizer gfxProps={completeGfxProps(initGFXProps)} GFXPropsUpdated={updateCurrentGFXProps} className="edit-surface-light-tone border-bottom padded" />
-      <LSConsole status={status} className={"edit-surface-gray-tone padded console-height"} />
+      <div style={{flex:2}} className="edit-surface-light-tone border-bottom">
+      <LSCodeEditor
+        style={{ width: "100%", overflow: "visible"}}
+        initialCode={currentCode}
+        onCodeWasEdited={updateCurrentCode}
+        className="code-text"
+        errorList={status?.errors}
+      />
+      </div>
+      <GFXPropsCustomizer
+        gfxProps={completeGfxProps(initGFXProps)}
+        GFXPropsUpdated={updateCurrentGFXProps}
+        className="edit-surface-light-tone border-bottom padded"
+      />
+      <LSConsole status={status} className={"edit-surface-gray-tone padded console-height code-text"} />
     </div>
   );
 };

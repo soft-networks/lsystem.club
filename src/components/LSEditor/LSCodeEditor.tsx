@@ -1,20 +1,21 @@
-import React from "react";
+import React, { useCallback } from "react";
 import Editor from "react-simple-code-editor";
 import { useEffect } from "react";
 import {syntaxHighlight} from "./codeSyntax"
+import { LSError } from "../utils";
 
 interface CodeEditorProps {
   initialCode?: string;
   style?: React.CSSProperties
   className?: string,
   onCodeWasEdited: (code: string) => void,
+  errorList?: LSError[]
 }
 
 
-const LSCodeEditor: React.FunctionComponent<CodeEditorProps> = ({ initialCode , style, onCodeWasEdited, className}) => {
+const LSCodeEditor: React.FunctionComponent<CodeEditorProps> = ({ initialCode , style, onCodeWasEdited, className, errorList}) => {
 
   const [code, setCode] = React.useState<string>(initialCode || "");
-
 
 
   //TODO: Move this up into LSEditor, because its running too often right now :)
@@ -22,9 +23,16 @@ const LSCodeEditor: React.FunctionComponent<CodeEditorProps> = ({ initialCode , 
     onCodeWasEdited(code);
   }, [onCodeWasEdited, code]);
 
-  const decorateCode = (code: string) => {
-    return syntaxHighlight(code);
-  }
+  const decorateCode = useCallback((code: string) => {
+    let classNameList: string[] = [];
+    if (errorList) {
+      errorList.forEach(err => {
+        if (err.lineNum !== "global")
+          classNameList[err.lineNum] = "display-as-error"
+      })
+    }
+    return syntaxHighlight(code, false, classNameList);
+  }, [errorList])
 
   return (
     <Editor

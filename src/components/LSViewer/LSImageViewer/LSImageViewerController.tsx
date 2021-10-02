@@ -4,6 +4,7 @@ import { completeGfxProps, GFXProps } from "../../utils";
 import LSImageViewer2D from "./LSImageViewer2D";
 import LSImageViewer3D from "./LSImageViewer3D";
 import { useEffect } from "react";
+import { axiomToStr } from "@bvk/lsystem/dist/parser";
 
 
 interface LSImageViewerControllerProps {
@@ -16,29 +17,36 @@ interface LSImageViewerControllerProps {
 type ImageRenderTypes = "2d" | "3d";
 
 function charIs3D(l: string) {
-  return l === "&" || l === "^" || l === "/" || l === "\\"
+  
+  let is3D = l == "&" || l == "^" || l == "/" || l == "\\";
+  console.log("Checking 3d " + l + " returning " + is3D);
+  return is3D;
 }
 function getViewerType(lSystem: LSystem, gfxProps?: GFXProps) : ImageRenderTypes {
+  console.log("VIEWER TYPE SETUP IS...", gfxProps)
   if (gfxProps && gfxProps.renderType && ! gfxProps.renderType.includes("auto")) {
     if (gfxProps.renderType.includes("2d")) 
       return "2d"
     if (gfxProps.renderType.includes("3d")) 
       return "3d"
   }
-  lSystem.axiom.forEach((l) => {
-    if (charIs3D(l.symbol)) {
+  for (let i =0; i<lSystem.axiom.length; i++) {
+    if (charIs3D(lSystem.axiom[i].symbol)) {
       return "3d"
     }
-  })
-  lSystem.productions.forEach((p) => {
-   let successors = Array.isArray(p.successor) ? p.successor : [p.successor];
-    successors.forEach( (s) => {
-      s.letters.forEach((l) => {
-        if (charIs3D(l.symbol))
-        return "3d"
-      })
-    })
-  })
+  }
+  for (let i =0; i<lSystem.productions.length; i++) {
+    let p = lSystem.productions[i];
+    let successors = Array.isArray(p.successor) ? p.successor : [p.successor]; 
+    for (let j = 0; j<successors.length; j++) {
+      let s = successors[j];
+      for (let k = 0; k<s.letters.length; k++) {
+        if (charIs3D(s.letters[k].symbol)) {
+          return "3d"
+        }
+      }
+    }
+  }
   return "2d"  
 }
 
@@ -62,8 +70,9 @@ const LSImageViewerController : React.FunctionComponent<LSImageViewerControllerP
   const getViewer = useCallback(() => {
     if (currentAxiom) {
       const viewerProps = { gfxProps: completeGfxProps(props.gfxProps), axiom: currentAxiom };
+      console.log("HERE WE GO, RENDERING NOW WITH ", viewerType);
       return viewerType === "2d" ? (
-        <LSImageViewer2D {...viewerProps} key="controller-viewer-2d" />
+        <LSImageViewer2D {...viewerProps} key="control ler-viewer-2d" />
       ) : (
         <LSImageViewer3D {...viewerProps} key="controller-viewer-3d" />
       );
@@ -87,9 +96,9 @@ const LSImageViewerController : React.FunctionComponent<LSImageViewerControllerP
 
   //If ls or gfx props change, viewer type may change
   useEffect(() => {
-    console.log("Changing LSystem or GFX props, should guess viewer type")
-    // const newViewerType = getViewerType(props.lSystem, props.gfxProps) ;
-    setViewerType(getViewerType(props.lSystem, props.gfxProps));
+    const newViewerType = getViewerType(props.lSystem, props.gfxProps) ;
+    console.log("💖💖💖💖💖 Changing LSystem or GFX props, should guess viewer type", newViewerType)
+    setViewerType(newViewerType);
   }, [props.lSystem, props.gfxProps])
 
 
@@ -120,15 +129,15 @@ const LSImageViewerController : React.FunctionComponent<LSImageViewerControllerP
 
 
   return (
-    <div className="stack">
+    <div className="stack no-gap">
       <div className="toolbar horizontal-stack edit-surface border-bottom">
-      <span> viewer: {viewerType}  </span> 
-      <span> iterations: {currentIteration} </span>
-      {currentlyAnimating.current === true ? (
-        <span onClick={() => stopIterationAnimation()} className="clickable"> stop </span>
-      ) : (
-        <span onClick={() => startIterationAnimation()} className="clickable"> start </span>
-      )}
+        <span> viewer: {viewerType}  </span> 
+        <span> iterations: {currentIteration} </span>
+        {currentlyAnimating.current === true ? (
+          <span onClick={() => stopIterationAnimation()} className="clickable"> stop </span>
+        ) : (
+          <span onClick={() => startIterationAnimation()} className="clickable"> start </span>
+        )}
       </div>
       {getViewer()}
     </div>

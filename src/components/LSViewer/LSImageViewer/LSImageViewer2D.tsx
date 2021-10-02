@@ -1,4 +1,4 @@
-import p5 from "p5"
+import p5, { PrintWriter } from "p5"
 import LSImageViewerBasic from "./LSImageViewerBasic";
 import { draw2DChar } from "./drawChar";
 
@@ -8,11 +8,13 @@ export default class LSImageViewer2D extends LSImageViewerBasic {
   drawCurrentAxiom = (p : p5) => {
     if (this.props.axiom !== undefined) {
       let cS = this.props.axiom
+      
       p.background(100,0,100);
       p.noFill();
       p.stroke(0, 0, 0);
       p.strokeWeight(this.props.gfxProps.strokeWeight);
       let steps = cS.length;
+      p.push();
       for (let i = 0; i < steps; i++) {
         let letter = cS[i];
         let char = letter.symbol;

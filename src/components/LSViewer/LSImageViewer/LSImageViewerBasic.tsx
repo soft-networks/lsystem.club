@@ -17,7 +17,7 @@ export interface LSImageViewerBasicState {
 }
 
 
-export default class LSImageViewerBasic extends React.Component<LSImageViewerBasicProps, LSImageViewerBasicState> {
+export default class LSImageViewerBasic< S extends LSImageViewerBasicState = LSImageViewerBasicState> extends React.Component<LSImageViewerBasicProps,S> {
 
   p5Context: p5 | undefined
   containerRef = React.createRef<HTMLDivElement>();
@@ -28,9 +28,9 @@ export default class LSImageViewerBasic extends React.Component<LSImageViewerBas
     super(props);
     //TODO: When to bind
     this.state = {
-      localScale: 1,
+      localScale: props.gfxProps.width / 600,
       localCenter: props.gfxProps.center
-    }
+    } as S
   }
   componentDidMount() {
     if (this.containerRef.current) 
@@ -40,10 +40,18 @@ export default class LSImageViewerBasic extends React.Component<LSImageViewerBas
     if (this.props.gfxProps.center !== prevProps.gfxProps.center) {
       this.setState({localCenter: this.props.gfxProps.center})
     }
+    if (this.props.gfxProps.width !== prevProps.gfxProps.width || this.props.gfxProps.height !== prevProps.gfxProps.height ) {
+      if (this.p5Context) {
+        console.log("🦋🦋🦋🦋🦋🦋🦋🦋 RESIZING CANVAS")
+        this.p5Context.resizeCanvas(this.props.gfxProps.width, this.props.gfxProps.height);
+        this.setState({ localScale: this.props.gfxProps.width / 600})
+      }
+    }
     this.redraw();
   }
 
   defaultSetup = (p: p5) => {
+    console.log("🦋🦋🦋🦋🦋🦋🦋🦋 creating canvas", this.props.gfxProps);
     let cnv = p.createCanvas(this.props.gfxProps.width, this.props.gfxProps.height, this.canvasType);
     cnv.id(this.canvasID);
     p.angleMode(p.DEGREES);
@@ -51,6 +59,7 @@ export default class LSImageViewerBasic extends React.Component<LSImageViewerBas
     p.noLoop();
     p.textFont("monospace ", 12);
     p.strokeCap("butt")
+  
   }
   preload = (p: p5) => {
     //Do nothing in the base case
@@ -97,6 +106,7 @@ export default class LSImageViewerBasic extends React.Component<LSImageViewerBas
   sketch = (p: p5) => {
  
     p.setup = () => {
+      console.log("💖💖💖💖 RUNNING SETUP NOW FOR P5")
       this.defaultSetup(p);
       this.preload(p);
       this.p5Context = p;
@@ -123,10 +133,10 @@ export default class LSImageViewerBasic extends React.Component<LSImageViewerBas
   getZoomControls = () => {
     return (
       <div key="zoom-controls">
-        <div className="clickable" onClick={(e) => this.handleZoom(+1)}>
+        <div className="clickable" onClick={(e) => this.handleZoom(+0.1)}>
           +
         </div>
-        <div className="clickable" onClick={(e) => this.handleZoom(-1)}>
+        <div className="clickable" onClick={(e) => this.handleZoom(-0.1)}>
           -
         </div>
       </div>);

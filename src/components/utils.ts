@@ -18,9 +18,13 @@ export interface CompleteLSExample {
   name?: string
 }
 
+export interface LSError {
+  lineNum: "global" | number,
+  error: Error
+}
 export interface LSStatus {
   state : "compiling" | "compiled" | "error" | "ready",
-  errors?: Error[]
+  errors?: LSError[]
 }
 export interface LSProps {
   axiom: string
@@ -33,7 +37,7 @@ export interface GFXPropsComplete {
   length: number
   angle: number
   center: number[]
-  width: number
+  width: number 
   height: number
   strokeWeight: number
   backgroundColor: string

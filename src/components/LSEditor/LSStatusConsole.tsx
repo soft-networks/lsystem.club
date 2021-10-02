@@ -35,7 +35,20 @@ const statusToEl = (status: LSStatus | undefined, timecode?: string) : JSX.Eleme
   } else {
   switch (status.state) {
     case "error":
-      stringEl = <div> <span> Status has error</span> <ul> { status.errors && status.errors.map((err, i) => <li key={`error-${i}`}> {err.message} </li>)} </ul></div> 
+      stringEl = (
+        <div>
+          <span> Status has error</span>
+          <ul>
+            {status.errors &&
+              status.errors.map((err, i) => (
+                <li key={`error-${i}`} >
+                  <span className="red">{err.lineNum === "global" ? "LS Creation failed" : "Error parsing line: " + err.lineNum}</span>
+                  <span>{err.error.message}</span>
+                </li>
+              ))}
+          </ul>
+        </div>
+      ); 
       break;
     case "compiling":
       stringEl = <div> Compiling </div>

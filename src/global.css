@@ -31,6 +31,7 @@ body {
   --editSurfaceGrayTone: #FDFCFF;
   --guideSurfaceLightTone: #FFFCF9;
   --guideSurface: #FFC738;
+  --red: red;
   
 }
 
@@ -72,10 +73,34 @@ em {
 .full-bleed {
   width: 100vw;
   height: 100vh;
+  overflow: scroll;
+}
+
+.narrow {
+  max-width: 72ch;
+}
+
+.narrow.centered {
+  margin: 0 auto;
 }
 
 
+
+
 .canvas-border canvas, .black-border {
+  border: 1px solid var(--black);
+}
+/* 
+.side-by-side  canvas {
+  width: 100% !important;
+  height: 100% !important;
+} */
+
+.flex-1 {
+  flex: 1;
+}
+
+.border {
   border: 1px solid var(--black);
 }
 
@@ -85,7 +110,15 @@ em {
 
 .border-right {
   border-right: 1px solid var(--black);
-
+}
+.border-left {
+  border-left: 1px solid var(--black);
+}
+.border-top {
+  border-top: 1px solid var(--black);
+}
+.red {
+  color: var(--red);
 }
 .red-border {
   border-color: rgba(255, 0, 0);
@@ -101,14 +134,56 @@ em {
 .padded {
   padding: var(--s0);
 }
+.padded\:vertical {
+  padding-top: var(--s0);
+  padding-bottom: var(--s0);
+}
+.padded\:horizontal {
+  padding-top: var(--s0);
+  padding-bottom: var(--s0);
+}
+.padded\:right {
+  padding-right: var(--s0);
+}
+.padded\:left {
+  padding-left: var(--s0);
+}
+.padded\:left\:smallest {
+  padding-left: var(--s-2);
+}
 
+
+.toolbar > * {
+  padding: var(--s0);
+}
 
 ul, ol {
   padding-left: var(--s1);
 }
 
+.hide-overflow {
+  overflow: hidden;
+}
+
+.wrap-text {
+  white-space: normal;
+}
+
+.wrap-text p {
+  display: inline;
+  
+}
 .clickable {
   cursor: pointer;
+}
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
 }
 
 .stack {
@@ -117,7 +192,6 @@ ul, ol {
 }
 
 .stack > * + *{
-  padding-top: var(--s0);
   margin-top: var(--s0);
 }
 
@@ -126,7 +200,6 @@ ul, ol {
 }
 
 .stack.no-gap > * + * {
-  padding-top: 0;
   margin-top: 0;
 }
 
@@ -134,13 +207,16 @@ ul, ol {
   border-top: 1px dotted gray;
 }
 
+
+.stack.smallest > * + * {
+  margin-top: var(--s-1);
+}
+
 .stack.small > * + * { 
-  padding-top: var(--s-1);
   margin-top: var(--s-1);
 }
 
 .stack.large > * + * {
-  padding-top: var(--s5);
   margin-top: var(--s5);
 }
 
@@ -158,6 +234,7 @@ ul, ol {
   display: inline-flex;
 }
 
+
 .side-by-side {
   display: flex;
   flex-direction: row;
@@ -165,8 +242,11 @@ ul, ol {
 
 .side-by-side > * {
   flex-basis: 50%;
+  max-width: 50%;
 }
-
+.side-by-side li  {
+  word-wrap: break-word;
+}
 .side-by-side .sticky {
   position: sticky;
   top: 0px;
@@ -177,7 +257,6 @@ ul, ol {
 .scrollable {
   overflow: scroll;
 }
-
 .padded .sticky {
   top: 1em;
   left: 1em;
@@ -194,6 +273,41 @@ ul, ol {
   opacity: 0;
 }
 
+.code-text > * {
+  position: relative;
+}
+
+pre, .code-text {
+  font-family: monospace;
+  font-size: var(--s0);
+  margin-left: 4ch;
+  overflow: visible;
+}
+
+.code-text textarea:focus {
+  outline: none !important;
+  
+}
+.code-text .line-number {
+  position: absolute;
+  left: calc(-3 * 1ch);
+  color: var(--editSurface);
+}
+.code-text .display-as-error {
+  text-decoration: underline;
+  text-decoration-color: var(--red);  
+}
+
+.code-text .display-as-error .line-number{
+  color: var(--red);
+}
+
+.code-text .display-as-error::before {
+  content: "•";
+  color: var(--red);
+  position: absolute;
+  left: calc( -1 * 1ch);
+}
 @keyframes fadein {
   0% {
     opacity: 0;
@@ -235,9 +349,7 @@ a , a:visited{
 .toolbar {
 }
 
-.toolbar > * {
-  padding: var(--s0);
-}
+
 .toolbar > * + * {
   border-left: 1px solid var(--black);
 }

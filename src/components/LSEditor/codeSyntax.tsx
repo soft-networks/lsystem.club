@@ -19,22 +19,71 @@ export const lineIsComment = (line: string) => {
   return lineNoWhitespace[0] === "*"
 }
 
-export const syntaxHighlight = (rawCode: string): React.ReactNode => {
+export const syntaxHighlight = (rawCode: string, wrapLines?: boolean, lineClassNames?: string[]): React.ReactNode => {
   const lines = splitLines(rawCode);  
-  return lines.map((line, i) => highlightLine(line, i));
-};
-
-function highlightLine(line: string, lineNumber: number): React.ReactNode {
-  if (lineIsComment(line)) {
-    return <span style={{ color: tokenColors.comment }}>{line}</span>;
+  console.log(lineClassNames)
+  const highlightedLines = lines.map((line, i) =>
+    highlightLine(line, i, lineClassNames ? lineClassNames[i] : undefined)
+  );
+  if (!wrapLines) {
+    return highlightedLines;
   }
-  const characters = line.split("");
-  return characters.map( character => highlightCharacter(character));
+  return highlightedLines.map((hLine, index) => <p key={"p" + index}> {hLine} </p>)
+};
+
+function highlightLine(line: string, lineNumber: number, lineClassName?: string): React.ReactNode {
+  let lineDOM; 
+  if (lineIsComment(line)) {
+    lineDOM = (
+      <span key={"l" + lineNumber} style={{ color: tokenColors.comment }}>
+        {line}
+      </span>
+    );
+  } else {
+    const characters = line.split("");
+    const characterDOM = [];
+
+    for (var i =0; i <characters.length;) {
+      if (i + 2 < characters.length && checkIsPhrase(characters[i], characters[i+1], characters[i+2])) {
+        characterDOM.push(higlightCharAsPhrase(characters[i], lineNumber + ":" + i));
+        characterDOM.push(higlightCharAsPhrase(characters[i+1], lineNumber + ":" + i+1));
+        characterDOM.push(higlightCharAsPhrase(characters[i+2], lineNumber + ":" + i+2)); 
+        i = i + 3;
+      } else {
+        characterDOM.push(highlightCharacter(characters[i], lineNumber + ":" + i));
+        i = i + 1;
+      }
+    } 
+    lineDOM = (
+      <span>
+        {characterDOM}
+       </span>
+    )
+  }
+  
+  return (
+    <span  className={lineClassName || ""}>
+      <span className="line-number no-select"> {lineNumber} </span>
+      {lineDOM}
+    </span>
+  );
 };
 
 
-
-function highlightCharacter(character: string) {
+function checkIsPhrase(c1: string, c2: string, c3: string) {
+  let s = c1 + c2 + c3;
+  if (s === "rnd" || s === "max" || s === "min") {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+function higlightCharAsPhrase(c: string, keyString: String){
+  let color : string = tokenColors.symbol;
+  return <span key={"token" + keyString} style={{color: color}}>{c}</span>
+}
+function highlightCharacter(character: string, keyString: string) {
   let color: string = tokenColors.symbol
   if (character.match('[A-Za-z]')) {  
     if (charactersSeen[character]) {
@@ -47,5 +96,5 @@ function highlightCharacter(character: string) {
       color = newColor;
     }
   }
-  return <span style={{color: color}}>{character}</span>
+  return <span key={"token" + keyString} style={{color: color}}>{character}</span>
 }
