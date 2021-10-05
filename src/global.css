@@ -73,7 +73,11 @@ em {
 .full-bleed {
   width: 100vw;
   height: 100vh;
-  overflow: scroll;
+  overflow: auto;
+}
+.full-size {
+  width: 100%;
+  height: 100%;
 }
 
 .narrow {
@@ -155,7 +159,21 @@ em {
 
 .toolbar > * {
   padding: var(--s0);
+  min-width: 10ch;
 }
+.toolbar .input-track {
+  width: 10ch;
+  height: var(--s-2);
+  position: relative;
+  top: 6px;
+  border-radius: var(--s0);
+}
+.toolbar .input-thumb {
+  width: var(--s0);
+  height: var(--s0);
+  border-radius: 50%;
+}
+
 
 ul, ol {
   padding-left: var(--s1);
@@ -163,6 +181,14 @@ ul, ol {
 
 .hide-overflow {
   overflow: hidden;
+}
+.visible-overflow {
+  overflow: visible;
+}
+.full-size.hide-overflow {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
 }
 
 .wrap-text {
@@ -203,21 +229,16 @@ ul, ol {
   margin-top: 0;
 }
 
-.stack.border > * + * {
-  border-top: 1px dotted gray;
-}
 
-
-.stack.smallest > * + * {
-  margin-top: var(--s-1);
+.stack.large > * + * {
+  margin-top: var(--s5);
 }
 
 .stack.small > * + * { 
   margin-top: var(--s-1);
 }
-
-.stack.large > * + * {
-  margin-top: var(--s5);
+.stack.smallest > * + * {
+  margin-top: var(--s-2);
 }
 
 .horizontal-stack {
@@ -228,6 +249,12 @@ ul, ol {
 
 .horizontal-stack.large {
   gap: var(--s2)
+}
+.horizontal-stack.small {
+  gap: var(--s-1)
+}
+.horizontal-stack.smallest {
+  gap: var(--s-2)
 }
 
 .horizontal-stack > * {
@@ -261,6 +288,18 @@ ul, ol {
   top: 1em;
   left: 1em;
 }
+.floating {
+  position: absolute;
+  z-index:  2;
+}
+.label {
+  font-size: var(--s-1);
+  position: absolute;
+  top: var(--s-2);
+}
+.button {
+  text-decoration: underline;
+}
 .floating-button {
   position: absolute;
   top: 1em;
@@ -291,7 +330,6 @@ pre, .code-text {
 .code-text .line-number {
   position: absolute;
   left: calc(-3 * 1ch);
-  color: var(--editSurface);
 }
 .code-text .display-as-error {
   text-decoration: underline;
@@ -308,6 +346,11 @@ pre, .code-text {
   position: absolute;
   left: calc( -1 * 1ch);
 }
+
+.Dropdown-root .Dropdown-arrow-wrapper {
+  display: inline;
+}
+
 @keyframes fadein {
   0% {
     opacity: 0;
@@ -346,7 +389,10 @@ a , a:visited{
   content: "⚘"
 }
 
-.toolbar {
+.toolbar input {
+  padding: 0;
+  margin: 0;
+  width: 10ch;
 }
 
 

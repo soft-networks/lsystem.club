@@ -42,7 +42,7 @@ export default class LSImageViewerBasic< S extends LSImageViewerBasicState = LSI
     }
     if (this.props.gfxProps.width !== prevProps.gfxProps.width || this.props.gfxProps.height !== prevProps.gfxProps.height ) {
       if (this.p5Context) {
-        console.log("🦋🦋🦋🦋🦋🦋🦋🦋 RESIZING CANVAS")
+        console.log("🦋🦋🦋🦋🦋🦋🦋🦋 RESIZING CANVAS", this.props.gfxProps)
         this.p5Context.resizeCanvas(this.props.gfxProps.width, this.props.gfxProps.height);
         this.setState({ localScale: this.props.gfxProps.width / 600})
       }
@@ -119,8 +119,7 @@ export default class LSImageViewerBasic< S extends LSImageViewerBasicState = LSI
   handleZoom = (zoomAmount: number) => {
     if (zoomAmount && zoomAmount !== 0) {
       let scale = this.state.localScale;
-      let amtChange = 1;
-      scale = zoomAmount > 0 ? scale + amtChange  : Math.max(scale - amtChange, 0.1);
+      scale = scale + zoomAmount * scale;
       console.log("Setting new scale" + scale);
       this.setState({localScale: scale})
     }
@@ -149,10 +148,10 @@ export default class LSImageViewerBasic< S extends LSImageViewerBasicState = LSI
       <div className="clickable" onClick={(e) => this.handlePan(0, 0.01)}>
         dw
       </div>
-      <div className="clickable" onClick={(e) => this.handlePan(-0.01, 0)}>
+      <div className="clickable" onClick={(e) => this.handlePan(0.01, 0)}>
         lf
       </div>
-      <div className="clickable" onClick={(e) => this.handlePan(0.01, 0)}>
+      <div className="clickable" onClick={(e) => this.handlePan(-0.01, 0)}>
         rt
       </div>
     </div>)

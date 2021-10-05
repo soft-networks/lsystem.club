@@ -1,9 +1,8 @@
 import React from "react";
 import LSystem from "@bvk/lsystem";
-import LSCustomizer from "./LSEditor/LSCustomizer";
-import { completeGfxProps, GFXProps, LSProps } from "./utils";
-import LSAllViewer from "./LSViewer";
+import {GFXProps } from "./utils";
 import { LSEditor } from "./LSEditor/LSEditor";
+import { LSViewer } from "./LSViewer";
 
 
 /* LSEditor.ts
@@ -21,6 +20,7 @@ interface LSEditorProps {
   saveToLocalStorage?: string
 }
 export default class LSEditAndView extends React.Component<LSEditorProps, LSEditorState> {
+  viewerContainer : HTMLDivElement | null = null;
   state: LSEditorState = {
       LSystem: undefined,
       gfxProps: this.props.initGFXProps || {}
@@ -36,7 +36,7 @@ export default class LSEditAndView extends React.Component<LSEditorProps, LSEdit
   }
   render() {
       return (
-        <div className="side-by-side" style={{height: "100%"}}>
+        <div className="side-by-side" style={{ height: "100%", maxHeight: "100%" }}>
           <LSEditor
             onLSReset={this.onLSReset}
             onLSIterated={this.onLSIterated}
@@ -47,7 +47,18 @@ export default class LSEditAndView extends React.Component<LSEditorProps, LSEdit
             saveToLocalStorage={this.props.saveToLocalStorage}
             className="border-right"
           />
-          <LSAllViewer LSystem={this.state.LSystem} gfxProps={this.state.gfxProps} />
+          {this.state.LSystem ? (
+            <LSViewer
+              key="image-viewer"
+              lSystem={this.state.LSystem}
+              gfxProps={this.state.gfxProps}
+              autoResize
+              changeViewerControls
+              changeIterationsControls
+            />
+          ) : (
+            <div>No-LSystem yet</div>
+          )}
         </div>
       );
     }

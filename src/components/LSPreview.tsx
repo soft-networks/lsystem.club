@@ -4,9 +4,8 @@ import { Link } from "react-router-dom";
 import {  encodePropsParams, GFXProps, LSProps, propsToCode } from "./utils";
 import VizSensor from "react-visibility-sensor";
 import { createLSInWorker } from "./worker";
-import { LSImageViewer2D, LSImageViewer3D, LSTextViewer } from "./LSViewer";
-import { Renderer } from "p5";
-import LSImageViewerController from "./LSViewer/LSImageViewer/LSImageViewerController";
+import { LSViewer, LSTextViewer } from "./LSViewer";
+import LSViewerController from "./LSViewer/LSViewerController";
 import { syntaxHighlight } from "./LSEditor/codeSyntax";
 
 interface LSPreviewProps {
@@ -61,15 +60,9 @@ export class LSPreview extends React.Component<LSPreviewProps, LSPreviewState> {
     let sizeProps = {}
     if (this.canvasContainer) {
       sizeProps = {width: this.canvasContainer.clientWidth, height: this.canvasContainer.clientWidth}
-      console.log("SIZE ESTABLISHED ", sizeProps)
     }
     const gfx = {...this.props.gfxProps, ...sizeProps};
-    console.log("Sending props", gfx);
-    if (gfx.renderType && gfx.renderType.includes("text")) {
-      renderers.push(LSTextViewer(this.state.currentLS));
-    } else {
-      renderers.push(<LSImageViewerController lSystem={this.state.currentLS} gfxProps={gfx} key="image-viewer-all" />);
-    }
+    renderers.push(<LSViewer lSystem={this.state.currentLS} gfxProps={gfx} key="image-viewer-all" changeIterationsControls />);
     return renderers;
   };
   render = () => {
@@ -85,13 +78,6 @@ export class LSPreview extends React.Component<LSPreviewProps, LSPreviewState> {
               <span className="clickable ">
                 <Link to={`/edit${encodePropsParams(this.props.LSProps, this.props.gfxProps)}`}>edit</Link>
               </span>
-              <input
-                type="range"
-                value={this.state.iterations}
-                onChange={this.updateIterations}
-                min={0}
-                max={this.props.LSProps.iterations}
-              />
             </div>
             <div className="edit-surface-light-tone flex-1 padded:vertical padded:right padded:left:smallest">
               <pre className=" wrap-text stack smallest code-text ">
