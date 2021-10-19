@@ -14,7 +14,6 @@ ReactDOM.render(
   <Router>
     <Route path="/edit" component={InteractiveEditor} />
     <Route exact path="/" component={Home} />
-    <Route exact path="/" component={Examples} />
     <Route exact path="/examples/Lilac" component={Lilac} />
     <Route exact path="/examples/Text" component={textGarden} />
     <Route exact path="/examples/WWW" component={WebPage} />

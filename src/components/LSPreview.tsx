@@ -1,7 +1,7 @@
 import LSystem from "@bvk/lsystem";
 import React from "react";
 import { Link } from "react-router-dom";
-import { codeToProps, encodeCodeParams, encodePropsParams, GFXProps, LSProps, propsToCode } from "../lib/utils";
+import { codeToProps, encodeCodeParams, GFXProps, LSProps } from "../lib/utils";
 import VizSensor from "react-visibility-sensor";
 import { createLSInWorker } from "../lib/worker";
 import { LSViewer } from "./LSViewer";
@@ -43,7 +43,7 @@ export class LSPreview extends React.Component<LSPreviewProps, LSPreviewState> {
   };
   createLS = (isVisible: boolean) => {
     if (isVisible && this.state.currentLS === undefined) {
-      // console.log("🐸🐸🐸🐸 Starting LS creating...");
+      console.log("🐸🐸🐸🐸 Starting LS creating...", this.props.gfxProps);
       const lsProps: LSProps = { ...codeToProps(this.props.code), iterations: this.state.iterations };
       createLSInWorker(lsProps)
         .then((ls) => {

@@ -1,7 +1,7 @@
 /* ./worker/worker.ts */
 
 import LSystem, { Axiom } from "@bvk/lsystem";
-import { LSProps } from "../utils";
+import { LSProps } from "../../lib/utils";
 
 
 //Just a simple test function

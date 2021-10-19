@@ -2,7 +2,7 @@
 import Worker from 'comlink-loader!./worker'; // inline loader
 
 import LSystem, { Axiom } from "@bvk/lsystem";
-import { LSProps } from "../utils";
+import { LSProps } from "../../lib/utils";
 
 
 export const createLSInWorker = async (lSystemProps: LSProps): Promise<LSystem> => {
