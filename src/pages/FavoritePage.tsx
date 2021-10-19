@@ -1,6 +1,6 @@
 import { LSPreview } from "../components/LSPreview";
-import PageLayout from "../components/PageLayout";
-import { codeToProps, getFave } from "../components/utils";
+import PageLayout from "../components/ui/PageLayout";
+import { codeToProps, getFave } from "../lib/utils";
 
 const FavoritePage: React.FunctionComponent = ({}) => {
 

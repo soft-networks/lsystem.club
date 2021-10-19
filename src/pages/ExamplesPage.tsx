@@ -1,6 +1,6 @@
 import { LSPreview } from "../components/LSPreview";
-import PageLayout from "../components/PageLayout";
-import { propsToCode } from "../components/utils";
+import PageLayout from "../components/ui/PageLayout";
+import { propsToCode } from "../lib/utils";
 import examples from "../data/examples";
 
 const Examples: React.FunctionComponent = ({}) => {

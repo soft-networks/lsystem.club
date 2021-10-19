@@ -1,6 +1,6 @@
 
 import qs from "qs";
-import { lineIsComment, splitLines } from "./LSEditor/codeSyntax";
+import { lineIsComment, splitLines } from "../components/LSEditor/codeSyntax";
 
 
 

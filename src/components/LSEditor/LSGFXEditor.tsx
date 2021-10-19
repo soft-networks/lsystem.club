@@ -1,5 +1,5 @@
 //GFXPropsCustomizer.js
-import {  GFXProps, GFXPropsComplete } from "../utils";
+import {  GFXProps, GFXPropsComplete } from "../../lib/utils";
 import React from  "react";
 import RangeSlider from "../ui/RangeSlider";
 

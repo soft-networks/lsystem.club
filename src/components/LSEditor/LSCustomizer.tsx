@@ -3,7 +3,7 @@ import LSystem, { Axiom, parseAxiom, parseProduction, Production } from "@bvk/ls
 import React from "react"
 import CopyToClipboard from "react-copy-to-clipboard";
 import { Link } from "react-router-dom";
-import { encodeParams, flattenLSProps, GFXProps, LSProps, completeGfxProps } from "../utils";
+import { encodeParams, flattenLSProps, GFXProps, LSProps, completeGfxProps } from "../../lib/utils";
 import { GFXPropsCustomizer } from "./LSGFXEditor";
 
 interface CustomizerProps {

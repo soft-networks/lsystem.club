@@ -1,9 +1,9 @@
 import LSystem from "@bvk/lsystem";
 import React from "react";
 import { Link } from "react-router-dom";
-import { codeToProps, encodeCodeParams, encodePropsParams, GFXProps, LSProps, propsToCode } from "./utils";
+import { codeToProps, encodeCodeParams, encodePropsParams, GFXProps, LSProps, propsToCode } from "../lib/utils";
 import VizSensor from "react-visibility-sensor";
-import { createLSInWorker } from "./worker";
+import { createLSInWorker } from "../lib/worker";
 import { LSViewer } from "./LSViewer";
 import { syntaxHighlight } from "./LSEditor/codeSyntax";
 import RangeSlider from "./ui/RangeSlider";

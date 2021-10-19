@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 import Editor from "react-simple-code-editor";
 import { useEffect } from "react";
 import {syntaxHighlight} from "./codeSyntax"
-import { LSError } from "../utils";
+import { LSError } from "../../lib/utils";
 
 interface CodeEditorProps {
   initialCode?: string;

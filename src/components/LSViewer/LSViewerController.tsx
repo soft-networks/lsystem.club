@@ -1,6 +1,6 @@
 import React, { CSSProperties, useCallback, useMemo, useRef, useState } from "react";
 import LSystem, { Axiom } from "@bvk/lsystem";
-import { completeGfxProps, GFXProps, renderTypes } from "../utils";
+import { completeGfxProps, GFXProps, renderTypes } from "../../lib/utils";
 import LSImageViewer2D from "./LSImageViewer/LSImageViewer2D";
 import LSImageViewer3D from "./LSImageViewer/LSImageViewer3D";
 import { useEffect } from "react";

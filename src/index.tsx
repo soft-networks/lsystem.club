@@ -8,10 +8,12 @@ import Lilac from './pages/Examples/Lilac';
 import textGarden from './pages/Examples/TextGarden';
 import WebPage from './pages/Examples/Webpage';
 import FavoritePage from './pages/FavoritePage';
+import Home from './pages/HomePage';
 
 ReactDOM.render(
   <Router>
     <Route path="/edit" component={InteractiveEditor} />
+    <Route exact path="/" component={Home} />
     <Route exact path="/" component={Examples} />
     <Route exact path="/examples/Lilac" component={Lilac} />
     <Route exact path="/examples/Text" component={textGarden} />

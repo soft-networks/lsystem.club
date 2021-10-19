@@ -1,4 +1,4 @@
-import { CompleteLSExample } from "../components/utils";
+import { CompleteLSExample } from "../lib/utils";
 
 const examples: CompleteLSExample[] = [
   {

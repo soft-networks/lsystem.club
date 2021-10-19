@@ -1,6 +1,6 @@
 import React from "react";
 import LSystem from "@bvk/lsystem";
-import {GFXProps } from "./utils";
+import {GFXProps } from "../lib/utils";
 import { LSEditor } from "./LSEditor/LSEditor";
 import { LSViewer } from "./LSViewer";
 

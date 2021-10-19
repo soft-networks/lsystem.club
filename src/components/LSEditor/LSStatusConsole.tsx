@@ -1,4 +1,4 @@
-import { LSStatus } from "../utils";
+import { LSStatus } from "../../lib/utils";
 import React, {useState, useEffect, useCallback, useRef} from "react"
 
 interface LSConsoleProps {

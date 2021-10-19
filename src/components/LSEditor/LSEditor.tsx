@@ -9,8 +9,8 @@ import {
   GFXPropsComplete,
   LSError,
   LSStatus,
-} from "../utils";
-import { createLSInWorker } from "../worker";
+} from "../../lib/utils";
+import { createLSInWorker } from "../../lib/worker";
 import LSConsole from "./LSStatusConsole";
 import LSCodeEditor from "./LSCodeEditor";
 import { GFXPropsCustomizer } from "./LSGFXEditor";

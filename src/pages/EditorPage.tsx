@@ -1,8 +1,8 @@
 import React from "react"
-import { decodeParams, GFXProps} from "../components/utils"
+import { decodeParams, GFXProps} from "../lib/utils"
 import { RouteComponentProps } from "react-router-dom";
 import LSEditAndView from "../components/LSEditAndView";
-import PageLayout from "../components/PageLayout";
+import PageLayout from "../components/ui/PageLayout";
 
 
 interface PathParams {
