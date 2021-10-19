@@ -9,11 +9,12 @@ interface CodeEditorProps {
   style?: React.CSSProperties
   className?: string,
   onCodeWasEdited: (code: string) => void,
-  errorList?: LSError[]
+  errorList?: LSError[],
+  tabIndex?: number
 }
 
 
-const LSCodeEditor: React.FunctionComponent<CodeEditorProps> = ({ initialCode , style, onCodeWasEdited, className, errorList}) => {
+const LSCodeEditor: React.FunctionComponent<CodeEditorProps> = ({ initialCode , style, onCodeWasEdited, className, errorList, tabIndex}) => {
 
   const [code, setCode] = React.useState<string>(initialCode || "");
 
@@ -41,7 +42,9 @@ const LSCodeEditor: React.FunctionComponent<CodeEditorProps> = ({ initialCode , 
       style={style}
       highlight={decorateCode}
       padding={10}
-      className={className}
+      className={className}       
+      tabIndex={tabIndex}
+      autoFocus
     />
   );
 };

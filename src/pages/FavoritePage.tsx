@@ -1,6 +1,6 @@
-import { Link } from "react-router-dom";
+import { LSPreview } from "../components/LSPreview";
 import PageLayout from "../components/PageLayout";
-import { encodeParams, getFave } from "../components/utils";
+import { codeToProps, getFave } from "../components/utils";
 
 const FavoritePage: React.FunctionComponent = ({}) => {
 
@@ -13,12 +13,12 @@ const FavoritePage: React.FunctionComponent = ({}) => {
   let links = Object.keys(faveList).map( (key) => {
     const fave = getFave(faveList[key]);
     if (fave) {
-      return <li> <Link to={`/edit${encodeParams(fave.code, fave.gfx)}`} > {fave.code} </Link> </li>
+      return <div> <LSPreview code={fave.code} gfxProps={fave.gfx} /></div>
     } else {
-      return <li> Fave corrupted, sorry </li>
+      return <div> <li> Fave corrupted, sorry </li></div>
     }
   })
-  return (<PageLayout><ul> {links} </ul> </PageLayout>)
+  return (<PageLayout><div className="grid padded"> {links} </div> </PageLayout>)
 }
 
 export default FavoritePage;

@@ -1,5 +1,6 @@
 import { LSPreview } from "../components/LSPreview";
 import PageLayout from "../components/PageLayout";
+import { propsToCode } from "../components/utils";
 import examples from "../data/examples";
 
 const Examples: React.FunctionComponent = ({}) => {
@@ -21,8 +22,8 @@ const StaticExamples: React.FunctionComponent = ({}) => {
       //let lS = new LSystem(example.axiom, example.productions, example.iterations);
       let preview = (
         <LSPreview
-          LSProps={example.lsProps}
-          gfxProps={example.gfxProps}
+          code={propsToCode(example.lsProps)}
+          gfxProps={ {...example.gfxProps, iterations: example.lsProps.iterations}}
           key={"eg-" + example.name}
           name={example.name}
         />

@@ -1,10 +1,11 @@
 //GFXPropsCustomizer.js
 import {  GFXProps, GFXPropsComplete } from "../utils";
 import React from  "react";
+import RangeSlider from "../ui/RangeSlider";
 
 interface GFXPropsCustomizerState {
-  length: string,
-  angle: string,
+  length: number,
+  angle: number,
   iterations: string
 }
 export class GFXPropsCustomizer extends React.Component<
@@ -12,23 +13,19 @@ export class GFXPropsCustomizer extends React.Component<
   GFXPropsCustomizerState
 > {
   state = {
-    length: "" + this.props.gfxProps.length,
-    angle: "" + this.props.gfxProps.angle,
+    length: this.props.gfxProps.length,
+    angle: this.props.gfxProps.angle,
     iterations: "" + this.props.gfxProps.iterations,
   };
-  updateAngle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let newAngle = e.target.value;
+  updateAngle = (newAngle: number) => {
     const newState = { ...this.state, ...{ angle: newAngle } };
     this.setState(newState);
-
-    this.props.GFXPropsUpdated({ angle: parseFloat(newAngle) || 1 });
+    this.props.GFXPropsUpdated({ angle: newAngle || 1 });
   };
-  updateLength = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let newLength = e.target.value;
+  updateLength = (newLength: number) => {
     const newState = { ...this.state, ...{ length: newLength } };
     this.setState(newState);
-
-    this.props.GFXPropsUpdated({ length: parseFloat(newLength) || 0.1 });
+    this.props.GFXPropsUpdated({ length: newLength || 0.1 });
   };
   updateIterations = (e: React.ChangeEvent<HTMLInputElement>) => {
     let newIterations = e.target.value;
@@ -38,21 +35,21 @@ export class GFXPropsCustomizer extends React.Component<
   };
   getControls = () => {
     let angleControl = (
-      <div key="customize-angle">
-        <label> Angle </label>
-        <input value={this.state.angle} onChange={this.updateAngle} type="number" />
+      <div key="customize-angle" className="horizontal-stack">
+        <label> Angle: {this.state.angle}° </label>
+        <RangeSlider min={0} max={360} onChange={this.updateAngle} currentValue={this.state.angle} key={"angle-slider"}/>
       </div>
     );
     let lengthControl = (
-      <div key="customize-length">
-        <label> Length </label>
-        <input value={this.state.length} onChange={this.updateLength} type="number" />
+      <div key="customize-length" className="horizontal-stack">
+        <label> Length: {this.state.length}% </label>
+        <RangeSlider min={0.1} max={100} onChange={this.updateLength} currentValue={this.state.length} key={"length-slider"}/>
       </div>
     );
     let iterationController = (
-      <div key="iteration-control">
-        <label> Iterations </label>
-        <input type="number" onChange={this.updateIterations} value={this.state.iterations} />
+      <div key="iteration-control" className="horizontal-stack">
+        <label> Max iterations </label>
+        <input type="number" onChange={this.updateIterations} value={this.state.iterations}  />
       </div>
     );
     return [iterationController, angleControl, lengthControl];

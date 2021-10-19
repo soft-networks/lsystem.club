@@ -17,6 +17,7 @@ import { GFXPropsCustomizer } from "./LSGFXEditor";
 import { useRef } from "react";
 import { lineIsComment, splitLines } from "./codeSyntax";
 import copy from "copy-to-clipboard";
+import {useHotkeys} from "react-hotkeys-hook"
 
 interface LSEditorProps {
   onLSReset(LS: LSystem): void;
@@ -57,6 +58,8 @@ export const LSEditor: React.FunctionComponent<LSEditorProps> = ({
   const [currentCode, setCurrentCode] = useState<string>(initializeCode);
   const lSystemNeedsReset = useRef<boolean>(true);
   const gfxPropsNeedsReset = useRef<boolean>(true);
+  const timer = useRef<number>();
+  useHotkeys("ctrl+Enter, command+Enter", () => {runLS()});
 
   useEffect(() => {
     isMounted.current = true;
@@ -81,29 +84,39 @@ export const LSEditor: React.FunctionComponent<LSEditorProps> = ({
     (lsProps) => {
       // console.log("Gonna run current LS");
       
+        timer.current = new Date().getMilliseconds();
         setStatus({ state: "compiling" });
-        createLSInWorker(lsProps).then((updatedLS) => {
-          if (isMounted.current) {
-            setLSystem(updatedLS);
-            setStatus({ state: "compiled" });
-          }
-        }).catch((e) => {
-          console.log(e);
-          setStatus({ state: "error", errors: [{lineNum: "global", error: e as Error}] });  
+
+        let timeoutCallback: NodeJS.Timeout; 
+        const timeoutTime = 120000;
+        const fn = new Promise(function (resolve, reject) {
+          timeoutCallback = setTimeout(() => {reject(new Error(`Timed out in ${timeoutTime/1000} seconds - try again with fewer iterations`))}, timeoutTime);
         });
+        Promise.race([fn, createLSInWorker(lsProps)])
+          .then((updatedLS) => {
+            if (isMounted.current) {
+              let timeTaken = Math.max(new Date().getMilliseconds() - (timer.current || new Date().getMilliseconds()),0);
+              setLSystem(updatedLS as LSystem);
+              setStatus({ state: "compiled", message: `in ${timeTaken} milliseconds` });
+            }
+          })
+          .catch((e) => {
+            console.log(e);
+            setStatus({ state: "error", errors: [{ lineNum: "global", error: e as Error }] });
+          })
+          .finally(() => clearTimeout(timeoutCallback));
     },
     [setStatus]
   );
 
   const updateCurrentGFXProps = useCallback(
     (gfxPropUpdate: GFXProps) => {
-      // console.log("Gfx props updated");
       setGFXProps((prevProps) => {
         if (gfxPropUpdate.iterations !== undefined && gfxPropUpdate.iterations !== prevProps.iterations) {
+          console.log("Updating parent iterations", gfxPropUpdate.iterations)
           lSystemNeedsReset.current = true;
-        } else {
-          gfxPropsNeedsReset.current = true;
-        }
+        } 
+        gfxPropsNeedsReset.current = true;
         return { ...prevProps, ...gfxPropUpdate };
       });
     },
@@ -155,17 +168,24 @@ export const LSEditor: React.FunctionComponent<LSEditorProps> = ({
   }, [createLSystem, currentCode, gfxProps.iterations]);
 
   const runLS = useCallback(() => {
-    // console.log("Time to run L-System");
+    console.log("Time to run L-System");
+    if (!gfxPropsNeedsReset.current && !lSystemNeedsReset.current) {
+      //The user has clicked RUN but nothing needs re-parsing, so just re-draw.
+      onGFXPropsUpdate(gfxProps)
+      setStatus({state: "redrawing"});
+    } 
     if (lSystemNeedsReset.current) {
       // console.log("recreating LS");
       parseLinesAndCreateLSystem();
       lSystemNeedsReset.current = false;
-    }
+    } 
     if (gfxPropsNeedsReset.current) {
-      // console.log("recreating GFX");
+      console.log("recreating GFX");
       onGFXPropsUpdate(gfxProps);
       gfxPropsNeedsReset.current = false;
     }
+    
+
   }, [gfxProps, onGFXPropsUpdate, parseLinesAndCreateLSystem]);
 
   const updateCurrentCode = useCallback(
@@ -196,30 +216,30 @@ export const LSEditor: React.FunctionComponent<LSEditorProps> = ({
 
   return (
     <div className={`stack no-gap ${className}`}>
-      <div className="horizontal-stack edit-surface toolbar border-bottom">
-        <span className="clickable" onClick={() => runLS()}>
-          Run LS
-        </span>
-        <span className="clickable" onClick={() => copyCurrentCode()}>
-          Share
-        </span>
-        <span className="clickable" onClick={() => saveCurrentCodeLocally()}>
-          Save to favorites
-        </span>
+      <div className="horizontal-stack small edit-surface toolbar border-bottom">
+        <div className="clickable" onClick={() => runLS()}>
+          grow<div className="gray subtext padded:left:smallest">(⌘+⏎)</div>
+        </div>
+        <div className="clickable" onClick={() => copyCurrentCode()}>
+          share link
+        </div>
+        <div className="clickable" onClick={() => saveCurrentCodeLocally()}>
+          save to favorites
+        </div>
       </div>
-      <div style={{flex:2}} className="edit-surface-light-tone border-bottom">
+      <div style={{flex:2}} className="edit-surface-light-tone border-bottom:light">
       <LSCodeEditor
         style={{ width: "100%", overflow: "visible"}}
         initialCode={currentCode}
         onCodeWasEdited={updateCurrentCode}
-        className="code-text"
+        className="code-text code-line-offset"
         errorList={status?.errors}
       />
       </div>
       <GFXPropsCustomizer
         gfxProps={completeGfxProps(initGFXProps)}
         GFXPropsUpdated={updateCurrentGFXProps}
-        className="edit-surface-light-tone border-bottom padded"
+        className="edit-surface-light-tone border-bottom grid gfx-controls "
       />
       <LSConsole status={status} className={"edit-surface-gray-tone padded console-height code-text"} />
     </div>

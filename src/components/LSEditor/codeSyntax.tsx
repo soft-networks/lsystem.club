@@ -18,10 +18,8 @@ export const lineIsComment = (line: string) => {
   const lineNoWhitespace = line.replace(/\s/g, "");
   return lineNoWhitespace[0] === "*"
 }
-
 export const syntaxHighlight = (rawCode: string, wrapLines?: boolean, lineClassNames?: string[]): React.ReactNode => {
   const lines = splitLines(rawCode);  
-  console.log(lineClassNames)
   const highlightedLines = lines.map((line, i) =>
     highlightLine(line, i, lineClassNames ? lineClassNames[i] : undefined)
   );

@@ -42,9 +42,10 @@ export default class LSImageViewerBasic< S extends LSImageViewerBasicState = LSI
     }
     if (this.props.gfxProps.width !== prevProps.gfxProps.width || this.props.gfxProps.height !== prevProps.gfxProps.height ) {
       if (this.p5Context) {
-        console.log("🦋🦋🦋🦋🦋🦋🦋🦋 RESIZING CANVAS", this.props.gfxProps)
         this.p5Context.resizeCanvas(this.props.gfxProps.width, this.props.gfxProps.height);
         this.setState({ localScale: this.props.gfxProps.width / 600})
+      } else {
+        console.log("⛔️⛔️⛔️⛔️ tried resizing canvas but p5 context doesnt exist yet")
       }
     }
     this.redraw();
@@ -161,7 +162,7 @@ export default class LSImageViewerBasic< S extends LSImageViewerBasicState = LSI
   }
   render() {
     return (
-      <div style={{ position: "relative" }}>
+      <div style={{ position: "absolute" }}>
         <div style={{ position: "absolute", right: 0, top: 0, zIndex: 2 }} className="padded" >
           {this.getCanvasControls()}
         </div>

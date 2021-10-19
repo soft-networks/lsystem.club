@@ -29,26 +29,18 @@ export default class LSImageViewer3D extends LSImageViewerBasic<LSImageViewer3DS
   rotateToUp = () => {
     let p = this.p5Context;
     if (!p) return
+    p.rotateZ(180);
+    p.rotateX( (this.state.upRot % 8) * 45);
+    p.rotateY( (this.state.lrRot % 8) * 45);
+    
   }
   moveToCanvasCenter = () => {
     let p = this.p5Context;
     if (!p) return;
-    let theta = this.state.lrRot;
-    let phi = this.state.upRot;
-    let x0 = 200 * 0.5;
-    let z0 = 200;
-    let y0 = 0;
-    let x1 ,y1,z1;
-    //Rotate around X axis
-    z1 = z0 * Math.cos(phi) - y0 * Math.sin(phi);
-    y1 = y0 * Math.cos(phi) + z0 * Math.sin(phi);
-    //Rotate around Y axis
-    x1 = x0 * Math.cos(theta) - z1 * Math.sin(theta);
-    z1 = z1 * Math.cos(theta) + x0 * Math.sin(theta);
-    p.camera(x1, y1, z1, 0,0,0,0,-1,0)
+
   } 
   getRotControls = (): JSX.Element => {
-    const turnUnit = Math.PI / 4;
+    const turnUnit = 1;
     return (
       <div key="rot-controls">
         <div className="clickable" onClick={() => this.setState({lrRot: this.state.lrRot + turnUnit})}> lr+ </div>

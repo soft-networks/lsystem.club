@@ -1,5 +1,6 @@
 
 import qs from "qs";
+import { lineIsComment, splitLines } from "./LSEditor/codeSyntax";
 
 
 
@@ -23,8 +24,9 @@ export interface LSError {
   error: Error
 }
 export interface LSStatus {
-  state : "compiling" | "compiled" | "error" | "ready",
-  errors?: LSError[]
+  state : "compiling" | "compiled" | "error" | "ready" | "redrawing"
+  errors?: LSError[],
+  message?: string
 }
 export interface LSProps {
   axiom: string
@@ -99,12 +101,17 @@ export function encodePropsParams(lsProps: LSProps, gfxProps?: GFXProps) {
   return encodeParams(code, gfx);
 }
 
+export function encodeCodeParams(code: string, gfxProps?: GFXProps) {
+  return encodeParams(code, gfxProps || {});
+}
+
 export function createFave(code?: string, gfxProps?: GFXProps) {
   return {code: code, gfx: gfxProps};
 }
 
 export function getFave(fave: any) {
   if (fave && fave.code) {
+    console.log("Getting fave", fave);
     return {code: fave.code, gfx: fave.gfx}
   }
   return undefined;
@@ -112,4 +119,15 @@ export function getFave(fave: any) {
 
 export function propsToCode(lsProps: LSProps) : string  {
   return lsProps.axiom + "\n" + lsProps.productions.join("\n");
+}
+
+export function codeToProps(code: string): LSProps {
+  let lines = code.split("\n")
+  lines = lines.filter(line => !lineIsComment(line));
+  lines = lines.filter(line => line.trim() !== "");
+  return {
+    axiom: lines[0],
+    productions: lines.slice(1),
+    iterations: 1
+  }
 }

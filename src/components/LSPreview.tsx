@@ -1,15 +1,15 @@
 import LSystem from "@bvk/lsystem";
 import React from "react";
 import { Link } from "react-router-dom";
-import {  encodePropsParams, GFXProps, LSProps, propsToCode } from "./utils";
+import { codeToProps, encodeCodeParams, encodePropsParams, GFXProps, LSProps, propsToCode } from "./utils";
 import VizSensor from "react-visibility-sensor";
 import { createLSInWorker } from "./worker";
-import { LSViewer, LSTextViewer } from "./LSViewer";
-import LSViewerController from "./LSViewer/LSViewerController";
+import { LSViewer } from "./LSViewer";
 import { syntaxHighlight } from "./LSEditor/codeSyntax";
+import RangeSlider from "./ui/RangeSlider";
 
 interface LSPreviewProps {
-  LSProps: LSProps;
+  code: string;
   gfxProps?: GFXProps;
   name?: string;
 }
@@ -28,15 +28,14 @@ export class LSPreview extends React.Component<LSPreviewProps, LSPreviewState> {
   canvasContainer: HTMLDivElement | null = null;
   state: LSPreviewState = {
     currentLS: undefined,
-    iterations: this.props.LSProps.iterations,
+    iterations: this.props.gfxProps && this.props.gfxProps.iterations ? this.props.gfxProps.iterations : 1,
     hasBeenVisible: false,
   };
 
-  updateIterations = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let newNum = parseFloat(e.target.value);
+  updateIterations = (newNum: number) => {
+    //TODO: Move to worker :)
     if (this.state.currentLS) {
       this.state.currentLS.setIterations(newNum);
-      //TODO: Move to worker :)
       this.setState({ currentLS: this.state.currentLS, iterations: newNum });
     } else {
       this.setState({ iterations: newNum });
@@ -45,47 +44,69 @@ export class LSPreview extends React.Component<LSPreviewProps, LSPreviewState> {
   createLS = (isVisible: boolean) => {
     if (isVisible && this.state.currentLS === undefined) {
       // console.log("🐸🐸🐸🐸 Starting LS creating...");
-      createLSInWorker(this.props.LSProps).then((ls) => {
-        // console.log("🐸🐸🐸🐸 WORKER FINISHED, NOW WE'RE SETTING STATE", ls);
-        this.setState({ currentLS: ls, hasBeenVisible: true });
-        // console.log("🐸🐸🐸🐸 LS Creating stopped", ls);
-      });
+      const lsProps: LSProps = { ...codeToProps(this.props.code), iterations: this.state.iterations };
+      createLSInWorker(lsProps)
+        .then((ls) => {
+          // console.log("🐸🐸🐸🐸 WORKER FINISHED, NOW WE'RE SETTING STATE", ls);
+          this.setState({ currentLS: ls, hasBeenVisible: true });
+          // console.log("🐸🐸🐸🐸 LS Creating stopped", ls);
+        })
+        .catch((e) => {
+          this.setState({ currentLS: undefined, hasBeenVisible: true });
+        });
     }
   };
   getRenderers = () => {
     if (this.state.currentLS === undefined || this.state.hasBeenVisible === false) {
       return "NO LS YET";
     }
-    let renderers = [];
-    let sizeProps = {}
-    if (this.canvasContainer) {
-      sizeProps = {width: this.canvasContainer.clientWidth, height: this.canvasContainer.clientWidth}
-    }
-    const gfx = {...this.props.gfxProps, ...sizeProps};
-    renderers.push(<LSViewer lSystem={this.state.currentLS} gfxProps={gfx} key="image-viewer-all" changeIterationsControls />);
-    return renderers;
+    return  
   };
   render = () => {
     return (
       <VizSensor onChange={this.createLS} partialVisibility={true}>
-        <div
-          className={`side-by-side  hide-overflow border ${
-            this.state.hasBeenVisible === false ? "" : "become-visible"
-          }`}
-        >
-          <div className="stack no-gap border-right">
-            <div className="horizontal-stack border-bottom  edit-surface toolbar">
-              <span className="clickable ">
-                <Link to={`/edit${encodePropsParams(this.props.LSProps, this.props.gfxProps)}`}>edit</Link>
-              </span>
-            </div>
-            <div className="edit-surface-light-tone flex-1 padded:vertical padded:right padded:left:smallest">
-              <pre className=" wrap-text stack smallest code-text ">
-                {syntaxHighlight(propsToCode(this.props.LSProps), true)}
+        <div className="stack no-gap">
+          <div
+            className={`side-by-side  hide-overflow border ${
+              this.state.hasBeenVisible === false ? "" : "become-visible"
+            }`}
+          >
+            <div className="edit-surface-light-tone flex-1 padded:vertical padded:right padded:left:smallest border-right">
+              <pre className=" wrap-text stack smallest code-text code-line-offset">
+                {syntaxHighlight(this.props.code)}
               </pre>
             </div>
+            <div>
+              {this.state.currentLS ? (
+                <LSViewer
+                  lSystem={this.state.currentLS}
+                  gfxProps={this.props.gfxProps}
+                  key="image-viewer-all"
+                  autoResize
+                  hideControls
+                  style={{ position: "relative", width: "100%", height: 340 }}
+                />
+              ) : (
+                "No L-System yet"
+              )}{" "}
+            </div>
           </div>
-          <div ref={(divElement) => (this.canvasContainer = divElement)}>{this.getRenderers()}</div>
+          <div className="horizontal-stack no-gap border-left">
+            <Link to={`/edit${encodeCodeParams(this.props.code, this.props.gfxProps)}`}>
+              <span className="edit-surface clickable  padded border-bottom border-right">edit</span>
+            </Link>
+            <div className="edit-surface padded border-bottom border-right">
+              <div style={{ width: "12ch" }}> Iterations: {this.state.iterations} </div>
+              <div style={{ width: "10ch", marginTop: "1ch" }}>
+                <RangeSlider
+                  currentValue={this.state.iterations}
+                  onChange={this.updateIterations}
+                  min={0}
+                  max={this.props.gfxProps && this.props.gfxProps.iterations ? this.props.gfxProps.iterations : 1}
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </VizSensor>
     );

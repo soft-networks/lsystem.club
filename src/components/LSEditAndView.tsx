@@ -53,8 +53,8 @@ export default class LSEditAndView extends React.Component<LSEditorProps, LSEdit
               lSystem={this.state.LSystem}
               gfxProps={this.state.gfxProps}
               autoResize
-              changeViewerControls
-              changeIterationsControls
+              style={{flex: "0 1", flexBasis: "100%", position: "relative"}} 
+              className="hide-overflow"
             />
           ) : (
             <div>No-LSystem yet</div>
