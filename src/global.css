@@ -1,5 +1,5 @@
 body {
-  background: rgb(255,255,251);
+  background: #FFFEFD;
 }
 
 :root {
@@ -24,7 +24,7 @@ body {
   margin: 0;
   word-wrap: break-word;
   --black: rgb(5,5,10);
-  --headerSurface: #DAFBF5;
+  --headerSurface: #E8DDF0;
    --guideSurface: #FFC738;
   --red: red;
   --gray: rgb(80,80,80);
@@ -98,21 +98,21 @@ h3 {
 }
 .header-surface {
   background: var(--headerSurface);
-  --black: #284A44;
+  --black: #1D1225;
 }
 .edit-surface {
-  background: #EDE7FF;
-  --gray: #cdc7de;
+  background: #DCFBF2;
+  --gray: #0B4836;
 }
 
 .edit-surface-light-tone {
-  background: #FCFBFF;
-  --gray: #dddbe4;
+  background: #F4FFFD;
+  --gray: #8FB6AA;
 }
 .edit-surface-gray-tone {
-  background: #efedf4;
-  --gray: #e3e0e8;
-  color: #736c80;
+  background: #EBF5F4;
+  --gray: #8FB6AA;
+  color: #64897E;
 }
 .guide-surface {
   background: var(--guideSurface);

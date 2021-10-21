@@ -56,7 +56,7 @@ const intro = (
     </p>
     <LSPreview
       code="A
-BA:F
+A:FB
 B:XZ"
       gfxProps={{ iterations: 10, renderType: ["text"] }}
     />

@@ -2,11 +2,6 @@ import { CompleteLSExample } from "../lib/utils";
 
 const examples: CompleteLSExample[] = [
   {
-    name: "Text example",
-    code: 'F\nF:BF\nBF',
-    gfxProps: { renderType: ["text"], iterations: 9 },
-  },
-  {
     name: "Spiral",
     code: "A\nA:FB + A\nA:FB + A\nB:[-(90)FF]",
     gfxProps: { angle: 5, center: [-0.1, 0] , iterations: 72},
