@@ -14,7 +14,7 @@ export type P5CanvasType = "webgl" | "p2d"
 export type renderTypes = "auto"  | "2d" | "3d" | "text" | "pixel";
 
 export interface CompleteLSExample {
-  lsProps: LSProps
+  code: string,
   gfxProps?: GFXProps
   name?: string
 }

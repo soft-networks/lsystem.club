@@ -7,16 +7,17 @@ const TableOfContents: React.FunctionComponent = () => {
   const [headings, setHeadings] = useState<Element[]>([]);
   useEffect(() => {
     const headingElements = Array.from(
-      document.querySelectorAll("h2, h3")
+      document.querySelectorAll("h1, h2")
     );
     setHeadings(headingElements);
 
   }, []);
+  
   return (
-    <nav aria-label="Table of contents" className="floating padded stack">
+    <nav aria-label="Table of contents" className="floating padded stack gray">
       {headings.map((el) => {
         return (
-          <a href={"#" + el.id} className={el.nodeName === "H3" ? "padded:left" : ""}>
+          <a href={"#" + el.id} className={getClassName(el.nodeName)}>
             {el.innerHTML}
           </a>
         );
@@ -24,5 +25,16 @@ const TableOfContents: React.FunctionComponent = () => {
     </nav>
   );
 };
+
+const getClassName = (nodeName: string) => {
+  if (nodeName === "H3") {
+    return "padded:left:large"
+  }
+  if (nodeName === "H1") {
+    return "bold "
+  }
+  return "padded:left"
+}
+
 
 export default TableOfContents;

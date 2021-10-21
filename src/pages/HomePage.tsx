@@ -1,14 +1,20 @@
 
+import { Table } from "p5";
 import React from "react"
 import PageLayout from "../components/ui/PageLayout";
-import intro from '../data/intro.md';
-import MarkdownLoader from "../components/ui/MarkdownLoader";
 import TableOfContents from "../components/ui/TableOfContents";
+import intro from '../data/intro';
+import Examples from "./ExamplesPage";
+
 
 const Home: React.FunctionComponent<{}> = () => {
   return (
     <PageLayout>
-      <MarkdownLoader markdownFile={intro} className="narrow centered" /> 
+      <TableOfContents/>
+      <div className="centered narrow markdown">
+        {intro}
+        <Examples/>
+      </div>
     </PageLayout>
   );
 }

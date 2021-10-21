@@ -54,7 +54,7 @@ export default class LSEditAndView extends React.Component<LSEditorProps, LSEdit
               gfxProps={this.state.gfxProps}
               autoResize
               style={{flex: "0 1", flexBasis: "100%", position: "relative"}} 
-              className="hide-overflow"
+              className="hide-overflow white-bg"
             />
           ) : (
             <div>No-LSystem yet</div>

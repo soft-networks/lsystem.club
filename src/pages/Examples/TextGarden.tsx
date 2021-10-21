@@ -6,19 +6,7 @@ import { CompleteLSExample, completeGfxProps } from "../../lib/utils";
 
 const textFlower: CompleteLSExample = {
   name: "textFlower",
-  lsProps: {
-    axiom: "[S] ",
-    productions: [
-      "S: A(rnd(5,10))",
-      "A(a) {a>=1}: F B(0) B(1) + A(a-1)",
-      "B(b) {b==0}: [+(75) F(20) f(10) T(0)]",
-      "B(b) {b==1}: [-(75) F(20) f(50) +(180) T(1)]",
-      "A(a) {a<1}: FFFF -(120) P(rnd(8,19))",
-      "P(p) {p>0}: [F(40) f(10) T(2)] [+(rnd(40,60)) P(p-1)]",
-      "P(p) {p==0}: X"
-    ],
-    iterations: 30,
-  },
+  code: "[S]\nS: A(rnd(5,10))\nA(a) {a>=1}: F B(0) B(1) + A(a-1)\nB(b) {b==0}: [+(75) F(20) f(10) T(0)]\nB(b) {b==1}: [-(75) F(20) f(50) +(180) T(1)]\nA(a) {a<1}: FFFF -(120) P(rnd(8,19))\nP(p) {p>0}: [F(40) f(10) T(2)] [+(rnd(40,60)) P(p-1)]\nP(p) {p==0}: X",
   gfxProps: {
     length: 40,
     renderType: ["2d"],
@@ -26,6 +14,7 @@ const textFlower: CompleteLSExample = {
     height: 760,
     angle: 5,
     center: [0,0.4],
+    iterations: 30,
   },
 };
 
@@ -33,11 +22,13 @@ const text = [{t:"you", s: 16},{t:"thank", s:16}, {t:"☼", s: 18}]
 const defaultText = {t: "", s: 12};
 
 export default function textGarden() {
-  let ls = new LSystem(textFlower.lsProps.axiom, textFlower.lsProps.productions, textFlower.lsProps.iterations);
-  let gfxProps = textFlower.gfxProps
-  console.log(ls.getAllIterationsAsString());
+  
+  return <div>todo</div>
+  // let ls = new LSystem(textFlower.lsProps.axiom, textFlower.lsProps.productions, textFlower.lsProps.iterations);
+  // let gfxProps = textFlower.gfxProps
+  // console.log(ls.getAllIterationsAsString());
 
-  return (<TextTurtle axiom={ls.getIterationAsObject()} gfxProps={completeGfxProps(gfxProps)} />)
+  // return (<TextTurtle axiom={ls.getIterationAsObject()} gfxProps={completeGfxProps(gfxProps)} />)
 }
 function drawText(p: p5, params: ParamsValue | undefined) {
   let index =  params && params.length == 1 ? parseInt(params[0]  as string) : -1;

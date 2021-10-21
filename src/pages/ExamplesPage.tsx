@@ -3,15 +3,6 @@ import PageLayout from "../components/ui/PageLayout";
 import { propsToCode } from "../lib/utils";
 import examples from "../data/examples";
 
-const Examples: React.FunctionComponent = ({}) => {
-  return (
-    <PageLayout>
-        <StaticExamples/>
-    </PageLayout>
-  );
-}
-export default Examples;
-
 //staticExamples.js
 
 const StaticExamples: React.FunctionComponent = ({}) => {
@@ -21,19 +12,24 @@ const StaticExamples: React.FunctionComponent = ({}) => {
     examples.forEach((example, index) => {
       //let lS = new LSystem(example.axiom, example.productions, example.iterations);
       let preview = (
+        <p >
+        <h2 id={example.name}> {example.name} </h2>
         <LSPreview
-          code={propsToCode(example.lsProps)}
-          gfxProps={ {...example.gfxProps, iterations: example.lsProps.iterations}}
+          code={example.code}
+          gfxProps={example.gfxProps}
           key={"eg-" + example.name}
           name={example.name}
         />
+        </p>
       );
       examplesDOM.push(preview);
     });
-    return <div className="stack narrow centered large"> {examplesDOM} </div>;
+    return <> <h1> Examples </h1> {examplesDOM} </>;
   }
   return drawExamples();
 }
+
+export default StaticExamples
 
 // {
 //   name: "fern",

@@ -58,21 +58,21 @@ export class LSPreview extends React.Component<LSPreviewProps, LSPreviewState> {
   };
   getRenderers = () => {
     if (this.state.currentLS === undefined || this.state.hasBeenVisible === false) {
-      return "NO LS YET";
+      return "L-System loading..";
     }
     return  
   };
   render = () => {
     return (
       <VizSensor onChange={this.createLS} partialVisibility={true}>
-        <div className="stack no-gap">
+        <div className="stack no-gap preview">
           <div
             className={`side-by-side  hide-overflow border ${
               this.state.hasBeenVisible === false ? "" : "become-visible"
             }`}
           >
             <div className="edit-surface-light-tone flex-1 padded:vertical padded:right padded:left:smallest border-right">
-              <pre className=" wrap-text stack smallest code-text code-line-offset">
+              <pre className=" wrap-text stack no-gap code-text code-line-offset">
                 {syntaxHighlight(this.props.code)}
               </pre>
             </div>
@@ -85,6 +85,7 @@ export class LSPreview extends React.Component<LSPreviewProps, LSPreviewState> {
                   autoResize
                   hideControls
                   style={{ position: "relative", width: "100%", height: 340 }}
+                  className="white-bg"
                 />
               ) : (
                 "No L-System yet"

@@ -5,36 +5,26 @@ import { CompleteLSExample, completeGfxProps, GFXProps } from "../../lib/utils"
 
 const lilacData: CompleteLSExample = {
   name: "lilac",
-  lsProps: {
-    axiom: "!(0.9) #(120) [ -(44)  ^(20) F(50) AK ] ",
-    productions: [
-      "A: P I(0) /(90)  A",
-      "I(t) {t!=2}:  F I(t+1)",
-      "I(t) {t==2}: ^(rnd(5,15)) #(rnd(60,150)) I(t+1)[-(45)FFA][+(45)FFA][FFA]",
-      "P: [-(45)/(45)K][+(45)/(45)K]",
-      "K: [F #(100) F [~ M(0.05)]]",
-      "M(s) {s<0.1}: M(s+0.05)",
-      "M(s) {s>=0.1}: M(0.1)"
-    ],
-    iterations: 16,
-  },
+  code: "!(0.9) #(120) [ -(44)  ^(20) F(50) AK ]\n\nA: P I(0) /(90)  A\nI(t) {t!=2}:  F I(t+1)\nI(t) {t==2}: ^(rnd(5,15)) #(rnd(60,150)) I(t+1)[-(45)FFA][+(45)FFA][FFA]\nP: [-(45)/(45)K][+(45)/(45)K]\nK: [F #(100) F [~ M(0.05)]]\nM(s) {s<0.1}: M(s+0.05)\nM(s) {s>=0.1}: M(0.1)",
   gfxProps: {
     length: 3,
     renderType: ["3d"],
     width: 1200,
     height: 850,
-    angle: 8
+    angle: 8,
+    iterations: 16
   },
 };
 export default function Lilac() {
-  let ls =  new LSystem(lilacData.lsProps.axiom, lilacData.lsProps.productions, lilacData.lsProps.iterations);
-  let gfxProps = lilacData.gfxProps; 
+  return (<div> todo </div>)
+  // let ls =  new LSystem(lilacData.lsProps.axiom, lilacData.lsProps.productions, lilacData.lsProps.iterations);
+  // let gfxProps = lilacData.gfxProps; 
 
-  return (
-    <div > 
-      <DrawLilac axiom={ls.getIterationAsObject()} gfxProps={completeGfxProps(gfxProps)} /> 
+  // return (
+  //   <div > 
+  //     <DrawLilac axiom={ls.getIterationAsObject()} gfxProps={completeGfxProps(gfxProps)} /> 
       
-    </div>)
+  //   </div>)
 }
 
 const flowerHue = 325;  
