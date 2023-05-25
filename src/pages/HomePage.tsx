@@ -10,7 +10,6 @@ import Examples from "./ExamplesPage";
 const Home: React.FunctionComponent<{}> = () => {
   return (
     <PageLayout>
-      <TableOfContents/>
       <div className="centered narrow markdown">
         {intro}
         <Examples/>
